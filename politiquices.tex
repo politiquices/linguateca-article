@@ -188,8 +188,8 @@ Dado que as personalidades envolvidas nas relações a extrair são personalidad
 
 \begin{itemize}  
 \item pessoas que são ou foram afiliadas a algum partido político português
-\item pessoas portuguesas nascidas depois de 1935 cuja profissão seja: \texit{juiz, economista, advogado, funcionário público, político, empresário ou banqueiro}
-\item pessoas que têm ou tiveram pelo menos um cargo de uma lista de cargos públicos portugueses previamente seleccionados (e.g.: \texit{ministro, líder do partido, embaixador}, etc.)
+\item pessoas portuguesas nascidas depois de 1935 cuja profissão seja: \textit{juiz, economista, advogado, funcionário público, político, empresário ou banqueiro}
+\item pessoas que têm ou tiveram pelo menos um cargo de uma lista de cargos públicos portugueses previamente seleccionados (e.g.: \textit{ministro, líder do partido, embaixador}, etc.)
 \end{itemize}  
 
 Para além dos resultados destas interrogações, seleccionámos manualmente alguns identificadores de personalidades não abrangidos pelas interrogações SPARQL definidas acima. Acrescentamos também todos os identificadores de partidos políticos a que as personalidades possam estar afiliadas. Este processo resultou num total de {\bf XXX} personalidades e de {\bf XXX} partidos políticos. Descarregamos depois a página na Wikidata para cada um dos identificadores recolhidos, utilizando um outro \textit{endpoint}\footnote{\url{https://www.wikidata.org/wiki/Special:EntityData?}} público.
@@ -278,7 +278,7 @@ O reconhecimento de entidades mencionadas é baseado num método híbrido combin
 
 Usando a componente \texttt{EntityRuler}\footnote{\url{https://spacy.io/usage/rule-based-matching}} do spaCy 3.0, definimos uma série de regras combinando padrões baseados nos nomes de todas as personalidades da BC. Para detectar as entidades do tipo pessoa este classificador aplica primeiro as regras e de seguida o modelo supervisionado para Português do spaCy.
 
-\texbf{TODO: quem decide o que é final? as regras ou o modelo?}
+\textbf{TODO: quem decide o que é final? as regras ou o modelo?}
 
 A Table~\ref{tab:results_ner} mostra a performance para as 3 abordagens sob o conjunto de dados anotado, contendo {\bf XXXX} personalidades políticas.
 
