@@ -424,7 +424,7 @@ São relatadas duas avaliações diferentes, Eval. 1 são os resultados para o a
 
 Decidimos decompor a tarefa de classificação do tipo de relação, descritas na Tabela~\ref{tab:rel_dataset}, em dois classificadores diferentes: um classificador para o tipo de relação e outro para a direcção da relação, por oposição a treinar um único classificador que teria que distinguir de entre 5 classes. Esta secção descreve o classificador do tipo de relação presente num título, tendo 3 classes possíveis: \textbf{opõe-se}, \textbf{apoia} e \textbf{outra}.
 
-Os dados foram divididos em 4 partições, de forma a podermos fazer uma avaliação cruzada. 
+Todas as experiências descritas foram feitas com uma avaliação cruzada de 4 partições, os resultados reportados são dos resultados sobre todos os conjuntos de teste.
 
 \begin{table}[!h]
     \begin{center}
@@ -445,7 +445,9 @@ Experimentamos e avaliámos diferentes abordagens para classificação supervisi
 
 Para o SVM utilizámos como \textit{features} uma abordagem baseada em vectores TF-IDF~\citep{DBLP:journals/ipm/SaltonB88}.
 
-Com a rede neuronal recorrente LSTM usamos uma arquitectura bidireccional, e usámos os \textit{embeddings} pré-treinados para Português disponibilizados por~\cite{hartmann-etal-2017-portuguese}.
+Com a rede neuronal recorrente LSTM usamos uma arquitectura bidireccional e os \textit{embeddings} pré-treinados para Português disponibilizados por~\cite{hartmann-etal-2017-portuguese}.
+
+O modelo DistilBERT foi treinado tendo como base o modelo % https://aclanthology.org/2020.sustainlp-1.16.pdf
 
 
 \begin{table}[!h]
@@ -738,6 +740,8 @@ Os triplos RDF gerados são então indexados num motor SPARQL~\citep{jena2015fre
 \section*{Agradecimentos}
 
 % Os agradecimentos devem ser colocados sempre numa secção final, sem número, tal como neste exemplo. Sempre que o autor assim o entender, deverá agradecer aos revisores.
+
+\newpage
 
 \bibliography{references.bib}
 
