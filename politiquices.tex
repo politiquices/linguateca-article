@@ -122,7 +122,7 @@ As principais contribuições deste trabalho são:
 \item{um interface web que permite explorar o gráfico semântico, permitindo filtrar o tipo de relações, o período de tempo das notícias, e o peso de uma relação, ou seja, o número de noticias que suportam uma relação entre duas personalidades.}
 \end{itemize}
 
-Este artigo está organizado da seguinte forma: na Secção~\ref{sec_related_work} referimos trabalho relacionado, na Secção~\ref{sec_kb} descrevemos a Base de Conhecimento usado no suporte de ligação das personalidades políticas à Wikidata. A Secção~\ref{sec:data_sources} refere e descreve as fontes de notícias utilizadas. Na Secção~\ref{sec:rel_data_annot} detalhamos o conjunto de dados anotados e na Secção~\ref{sec:classifiers} os classificadores de aprendizagem supersvisionada desenvolvidos. Na Secção~\ref{sec:pipeline} descrevemos o processo extracção de triplos e a construção do gráfico semântico. Finalmente, na Secção~\ref{sec:future_work} apresentamos ideias futuras para melhorar e continuar este trabalho.
+Este artigo está organizado da seguinte forma: na Secção~\ref{sec_related_work} referimos trabalho relacionado, na Secção~\ref{sec_kb} descrevemos a Base de Conhecimento usado no suporte de ligação das personalidades políticas à Wikidata. A Secção~\ref{sec:data_sources} refere e descreve as fontes de notícias utilizadas. Na Secção~\ref{sec:rel_data_annot} detalhamos o conjunto de dados anotados e na Secção~\ref{sec:classifiers} os classificadores de aprendizagem supervisionada desenvolvidos. Na Secção~\ref{sec:pipeline} descrevemos o processo extracção de triplos e a construção do gráfico semântico. Finalmente, na Secção~\ref{sec:future_work} apresentamos ideias futuras para melhorar e continuar este trabalho.
 
 
 \section{Trabalho Relacionado}
@@ -218,25 +218,27 @@ Começamos por pré-processar todos os títulos automáticamente. Usando o pacot
 
 Fomos depois seleccionando títulos para anotação. Sempre que necessário corrigimos as entidades reconhecidos e o identificador na Wikidata, e anotamos a relação existente: \textbf{oposição} ou \textbf{apoio}, e a direcção da mesma. Quando nenhuma das duas se verifica a relação é anotada como \textbf{outra}. A Tabela~\ref{tab:samples} demonstra alguns exemplos das relações anotadas.
 
-Este processo resultou num conjunto de dados contendo {\bf XXXX} títulos anotados e {\bf XXXX} personalidades políticas. A Tabela~\ref{tab:rel_dataset} caracteriza os dados em termos de número de relações e direcção. É de notar que a maioria dos títulos contém uma relação de \textbf{oposição} ou \textbf{outra}, e a grande maioria as relações têm uma direcção da primeira para a segunda entidade, Ent\textsubscript{1}$\rightarrow$Ent\textsubscript{2}.
+Este processo resultou num conjunto de dados contendo 3.324 títulos anotados e {\bf XXXX} personalidades políticas. A Tabela~\ref{tab:rel_dataset} caracteriza os dados em termos de número de relações e direcção. É de notar que a maioria dos títulos contém uma relação de \textbf{oposição} ou \textbf{outra}, e a grande maioria as relações têm uma direcção da primeira para a segunda entidade, Ent\textsubscript{1}$\rightarrow$Ent\textsubscript{2}.
 
+% jq -r '"\(.label)"' < politiquices_data_v3.0.jsonl | sort | uniq -c
 
 \begin{table}[!h]
     \begin{center}
     \begin{tabular}{l ccr}
         {\bf Relação} & {\bf \footnotesize{Ent\textsubscript{1}$\rightarrow$Ent\textsubscript{2}}} & {\bf \footnotesize{Ent\textsubscript{2}$\rightarrow$Ent\textsubscript{1}}} & {\bf Total} \\
         \hline
-        opõe-se          &  1009  &  90  & 1 099  \\
-        apoia            &  480   &  39  &   519  \\
-        outra            &  -     &  -   & 1 064  \\
+        opõe-se          &  1 155  &  102  &  1 257  \\
+        apoia            &    717  &   44  &    761  \\
+        outra            &    -    &   -   &  1 306  \\
 		\hline
-		Total			 &  1489  &  129 & 2 682  \\
+		Total			 &  1 872  &  146  &  3 324  \\
     \end{tabular}
 	\caption{Relações por classe e direcção.}
 	\label{tab:rel_dataset}
 	\end{center}
 \end{table}
 
+{\bf TODO: tabela aqui e referir as entidades ligadas à Wikidata}
 
 
 \begin{comment}
@@ -280,7 +282,7 @@ Usando a componente \texttt{EntityRuler}\footnote{\url{https://spacy.io/usage/ru
 
 \textbf{TODO: quem decide o que é final? as regras ou o modelo?}
 
-A Table~\ref{tab:results_ner} mostra a performance para as 3 abordagens sob o conjunto de dados anotado, contendo {\bf XXXX} personalidades políticas.
+A Tabela~\ref{tab:results_ner} mostra a performance para as 3 abordagens sob o conjunto de dados anotado, contendo {\bf XXXX} personalidades políticas.
 
 \begin{table}[!h]
     \begin{center}
@@ -439,21 +441,16 @@ Os dados foram divididos em 4 partições, de forma a podermos fazer uma avalia�
 \end{table}
 
 
-%Utilizámos uma abordagem baseada em vectores TF-IDF~\citep{DBLP:journals/ipm/SaltonB88} como base de referência, e alimentámo-los com um classificador linear SVM~\citep{cortes1995support}.
+Experimentamos e avaliámos diferentes abordagens para classificação supervisionada das relações presentes nos títulos, nomeadamente: um classificador SVM~\citep{cortes1995support} com um kernel linear, uma rede neuronal recorrente do tipo LSTM~\citep{10.1162/neco.1997.9.8.1735}, e uma rede neural do tipo \textit{transformer}, o DistilBERT~\citep{9463516}.
 
-Experimentamos e avaliámos diferentes abordagens para classificação supervisiona das relações presentes nos títulos, nomeadamente:
 
-\begin{itemize}
-\item LinearSVC
-\item biLSTM
-\item DistilBERT
-\end{itemize}
+Para o SVM utilizámos como \textit{features} uma abordagem baseada em vectores TF-IDF~\citep{DBLP:journals/ipm/SaltonB88}.
 
 
 \begin{table}[!h]
     \begin{center}
     \begin{tabular}{l ccc}
-		\multicolumn{4}{c}{LinearSVC}\\
+		\multicolumn{4}{c}{SVM}\\
 		\hline
         {\bf Relação} & {\bf P} & {\bf A} & {\bf F\textsubscript{1}} \\
 		\hline
@@ -463,7 +460,7 @@ Experimentamos e avaliámos diferentes abordagens para classificação supervisi
 		\hline
 		Macro-Média      &	0.69  &  0.69  &  0.69   \\
     \end{tabular}
-	% \caption{(P)recisão, A(brangência) e F\textsubscript{1} para uma avaliação com 4-partições e validação cruzada.}
+	%\caption{(P)recisão, A(brangência) e F\textsubscript{1} para uma avaliação com 4-partições e validação cruzada.}
 	\end{center}
 \end{table}
 
@@ -472,13 +469,14 @@ Experimentamos e avaliámos diferentes abordagens para classificação supervisi
     \begin{center}
     \begin{tabular}{l ccc}
 		\multicolumn{4}{c}{bi-LSTM}\\
+		\hline
         {\bf Relação} & {\bf P} & {\bf A} & {\bf F\textsubscript{1}} \\
 		\hline
-        opõe-se          &  0.xx  &  0.xx  &  0.xx   \\
-        outra            &  0.xx  &  0.xx  &  0.xx   \\
-        apoia            &  0.xx  &  0.xx  &  0.xx   \\
+        opõe-se          &  0.75  &  0.64  &  0.69   \\
+        outra            &  0.65  &  0.75  &  0.70   \\
+        apoia            &  0.65  &  0.62  &  0.63   \\
 		\hline
-		Macro-Média      &  0.xx  &  0.xx  &  0.xx   \\
+		Macro-Média      &  0.69  &  0.68  &  0.68   \\
     \end{tabular}
 	\end{center}
 \end{table}
@@ -488,16 +486,18 @@ Experimentamos e avaliámos diferentes abordagens para classificação supervisi
     \begin{center}
     \begin{tabular}{l ccc}
 		\multicolumn{4}{c}{DistilBERT}\\
+		\hline
         {\bf Relação} & {\bf P} & {\bf A} & {\bf F\textsubscript{1}} \\
 		\hline
-        opõe-se          &  0.xx  &  0.xx  &  0.xx   \\
-        outra            &  0.xx  &  0.xx  &  0.xx   \\
-        apoia            &  0.xx  &  0.xx  &  0.xx   \\
+        opõe-se          &  0.74  &  0.76  &  0.75   \\
+        outra            &  0.72  &  0.71  &  0.72   \\
+        apoia            &  0.72  &  0.71  &  0.71   \\
 		\hline
-		Macro-Média      &  0.xx  &  0.xx  &  0.xx   \\
+		Macro-Média      &  0.73  &  0.72  &  0.72   \\
     \end{tabular}
 	\end{center}
 \end{table}
+
 
 
 
