@@ -443,8 +443,9 @@ Os dados foram divididos em 4 partições, de forma a podermos fazer uma avalia�
 
 Experimentamos e avaliámos diferentes abordagens para classificação supervisionada das relações presentes nos títulos, nomeadamente: um classificador SVM~\citep{cortes1995support} com um kernel linear, uma rede neuronal recorrente do tipo LSTM~\citep{10.1162/neco.1997.9.8.1735}, e uma rede neural do tipo \textit{transformer}, o DistilBERT~\citep{9463516}.
 
-
 Para o SVM utilizámos como \textit{features} uma abordagem baseada em vectores TF-IDF~\citep{DBLP:journals/ipm/SaltonB88}.
+
+Com a rede neuronal recorrente LSTM usamos uma arquitectura bidireccional, e usámos os \textit{embeddings} pré-treinados para Português disponibilizados por~\cite{hartmann-etal-2017-portuguese}.
 
 
 \begin{table}[!h]
