@@ -6,15 +6,16 @@
 
 % added packages
 \usepackage{comment}
+\usepackage{amsmath}
 \usepackage{makecell} % for formating column heads
 \renewcommand\theadfont{\bfseries}
-\usepackage{subfig}
+\usepackage{subcaption}	% for \subtable
 \usepackage{graphicx} % http://ctan.org/pkg/graphicx
-\usepackage{listings} % see below
-\renewcommand{\lstlistingname}{Algorithm}% rename caption: Listing -> Algorithm
+%\usepackage{listings} % see below
+%\renewcommand{\lstlistingname}{Algorithm}% rename caption: Listing -> Algorithm
 \usepackage{color}
 \usepackage{multirow}
-%\usepackage{coffee}
+
 
 %% Please use UTF8 in your document
 
@@ -33,10 +34,10 @@
 
 
 %% Add your title in the main language used in the article
-\title{Explorando Relações de Apoio e Oposição \\em Títulos de Notícias de Política}
+\title{Extracção de Relações de Apoio e Oposição \\em Títulos de Notícias de Política}
 
 %% Currenty the title in English is also mandatory
-\titleEN{Exploring Support and Opposition Relationships in Portuguese Political News Headlines}
+\titleEN{Extraction of Support and Opposition Relationships in Portuguese Political News Headlines}
 
 
 %% Add authors here. Three lines for each author.
@@ -67,11 +68,7 @@ Neste artigo descrevemos em detalhe processo de extracção de relações dos t�
 %% Add keywords in the article main language, in lowercase
 \palavraschave{web semântica, RDF, PLN, relações semânticas, ciência política, dados anotados}
 
-
-
 \newpage
-
-
 
 %% Add the abstract in English
 \begin{abstract}
@@ -83,10 +80,7 @@ In this paper we describe in detail process of extracting relations from news he
 %% add the keywords in English
 \keywords{semantic web, RDF, NLP, semantic relationships, political science, annotated dataset}
 
-
-
 \newpage
-
 
 \section{Introdução}
 \label{sec:intro}
@@ -123,7 +117,6 @@ As principais contribuições deste trabalho são:
 \end{itemize}
 
 Este artigo está organizado da seguinte forma: na Secção~\ref{sec_related_work} referimos trabalho relacionado, na Secção~\ref{sec_kb} descrevemos a Base de Conhecimento usado no suporte de ligação das personalidades políticas à Wikidata. A Secção~\ref{sec:data_sources} refere e descreve as fontes de notícias utilizadas. Na Secção~\ref{sec:rel_data_annot} detalhamos o conjunto de dados anotados e na Secção~\ref{sec:classifiers} os classificadores de aprendizagem supervisionada desenvolvidos. Na Secção~\ref{sec:pipeline} descrevemos o processo extracção de triplos e a construção do gráfico semântico. Finalmente, na Secção~\ref{sec:future_work} apresentamos ideias futuras para melhorar e continuar este trabalho.
-
 
 \section{Trabalho Relacionado}
 \label{sec_related_work}
@@ -181,7 +174,6 @@ No contexto de análise de notícias de política em Português, e tanto quanto 
   \label{tab:samples}
 \end{table*}
 
-
 \section{Base de Conhecimento}
 \label{sec_kb}
 Dado que as personalidades envolvidas nas relações a extrair são personalidades políticas relevantes, começámos por construir uma Base de Conhecimento usando a Wikidata~\citep{MKGGB2018}. Fazendo interrogações SPARQL~\cite{2013sparql} ao seu \textit{endpoint} público~\footnote{\url{https://query.wikidata.org/sparql}} recolhemos o identificador de todas as:
@@ -192,10 +184,12 @@ Dado que as personalidades envolvidas nas relações a extrair são personalidad
 \item pessoas que têm ou tiveram pelo menos um cargo de uma lista de cargos públicos portugueses previamente seleccionados (e.g.: \textit{ministro, líder do partido, embaixador}, etc.)
 \end{itemize}  
 
-Para além dos resultados destas interrogações, seleccionámos manualmente alguns identificadores de personalidades não abrangidos pelas interrogações SPARQL definidas acima. Acrescentamos também todos os identificadores de partidos políticos a que as personalidades possam estar afiliadas. Este processo resultou num total de {\bf XXX} personalidades e de {\bf XXX} partidos políticos. Descarregamos depois a página na Wikidata para cada um dos identificadores recolhidos, utilizando um outro \textit{endpoint}\footnote{\url{https://www.wikidata.org/wiki/Special:EntityData?}} público.
+Para além dos resultados destas interrogações, seleccionámos manualmente alguns identificadores de personalidades não abrangidas pelas interrogações SPARQL definidas acima, muitas delas de um contexto político internacional, mas que interagem com personalidades portuguesas. Acrescentamos também todos os identificadores de partidos políticos a que as personalidades possam estar afiliadas. Este processo resultou num total de 1.757 personalidades e de 37 partidos políticos. De notar, que alguns dos partidos incluídos são partidos já extintos, e alguns são partidos de um contexto internacional. Para cada um dos identificadores das personalidades e partidos políticos descarregamos a página correspondente na Wikidata utilizando um outro \textit{endpoint}\footnote{\url{https://www.wikidata.org/wiki/Special:EntityData?}} público.
+
+% SELECT (COUNT(DISTINCT ?person) as ?nr_persons) {?person wdt:P31 wd:Q5;}
+% SELECT (COUNT(DISTINCT ?person) as ?nr_parties) {?person wdt:P31 wd:Q7278;}
 
 Para cada personalidade política, seleccionámos o seu identificador na Wikidata, o seu nome mais comum e os nomes alternativos, por exemplo combinações de nomes próprios e apelidos. Com base nestes três campos, criámos um índice no ElasticSearch~\citep{10.5555/2904394} usando a sua configuração de omissão, não fazendo uso de qualquer funcionalidade extra tais como analisadores de $n$-gramas.
-
 
 \section{Fontes de dados}
 \label{sec:data_sources}
@@ -204,10 +198,7 @@ A principal fonte de notícias foi o arquivo da web portuguesa~\citep{SearchPast
 
 Uma segunda fonte de notícias foi a colecção CHAVE\footnote{\url{https://www.linguateca.pt/CHAVE/}}~\citep{DBLP:conf/clef/SantosR04, santos-rocha-2001-evaluating}, contendo os artigos do jornal PÚBLICO publicados entre 1994 e 1995. Finalmente, também acrescentámos alguns artigos não arquivados pelo arquivo.pt, retirados directamente das secções {\it Mundo}, {\it Política} e {\it Sociedade} do site publico.pt. 
 
-Deste processo resultou uma colecção de cerca de \textbf{XXXX} milhões de artigos publicados entre 1994 e \textbf{XXXX}. De seguida foi aplicado um pré-processamento de modo a remover notícias com: títulos duplicados, títulos com menos de 4 palavras, e títulos ou URL contendo palavras de uma lista pré-definida (e.g.: desporto, celebridades, artes, cinema) que sugerem um o outro contexto que não política. Este pré-processamento resultou em \textbf{XXXX} milhões de títulos, cerca de \textbf{XXXX}\% dos dados inicialmente recolhidos.
-
-% A grande maioria das notícias tem como origem o arquivo da web portuguesa, através da sua \textit{API} que retorna o título e o HTML original da página. Limpar os dados, de forma a descartar todo o HTML e ter o corpo da notícia não é uma tarefa simples, especialmente considerando o variedade de domínios e o período temporal. Por esta razão optamos por focar a extracção de relações no título das notícias.
-
+Deste processo resultou uma colecção de cerca de 13.7 milhões de títulos de artigos publicados entre 1994 e 2022. De seguida foi aplicado um pré-processamento de modo a remover notícias com: títulos duplicados, títulos com menos de 4 palavras, e títulos ou URLs contendo palavras que fazem partem de uma lista pré-definida (e.g.: desporto, celebridades, artes, cinema, etc.) que sugerem um o outro contexto que não política. Este pré-processamento resultou em 1.3 milhões de títulos distintos, cerca de 10\% dos dados inicialmente recolhidos.
 
 \section{Colecção de Relações Anotadas}
 \label{sec:rel_data_annot}
@@ -218,11 +209,11 @@ Começamos por pré-processar todos os títulos automáticamente. Usando o pacot
 
 Fomos depois seleccionando títulos para anotação. Sempre que necessário corrigimos as entidades reconhecidos e o identificador na Wikidata, e anotamos a relação existente: \textbf{oposição} ou \textbf{apoio}, e a direcção da mesma. Quando nenhuma das duas se verifica a relação é anotada como \textbf{outra}. A Tabela~\ref{tab:samples} demonstra alguns exemplos das relações anotadas.
 
-Este processo resultou num conjunto de dados contendo 3.324 títulos anotados e {\bf XXXX} personalidades políticas. A Tabela~\ref{tab:rel_dataset} caracteriza os dados em termos de número de relações e direcção. É de notar que a maioria dos títulos contém uma relação de \textbf{oposição} ou \textbf{outra}, e a grande maioria as relações têm uma direcção da primeira para a segunda entidade, Ent\textsubscript{1}$\rightarrow$Ent\textsubscript{2}.
+Este processo resultou num conjunto de dados contendo 3324 títulos anotados e 6648 menções a nomes de personalidades políticas. A Tabela~\ref{tab:rel_dataset} caracteriza os dados em termos de número de relações e direcção. É de notar que a maioria dos títulos contém uma relação de \textbf{oposição} ou \textbf{outra}, e a grande maioria as relações têm uma direcção da primeira para a segunda entidade, Ent\textsubscript{1}$\rightarrow$Ent\textsubscript{2}.
 
 % jq -r '"\(.label)"' < politiquices_data_v3.0.jsonl | sort | uniq -c
 
-\begin{table}[!h]
+\begin{table}
     \begin{center}
     \begin{tabular}{l ccr}
         {\bf Relação} & {\bf \footnotesize{Ent\textsubscript{1}$\rightarrow$Ent\textsubscript{2}}} & {\bf \footnotesize{Ent\textsubscript{2}$\rightarrow$Ent\textsubscript{1}}} & {\bf Total} \\
@@ -238,51 +229,36 @@ Este processo resultou num conjunto de dados contendo 3.324 títulos anotados e 
 	\end{center}
 \end{table}
 
-{\bf TODO: tabela aqui e referir as entidades ligadas à Wikidata}
+% jq -r '"\(.ent1_id) \(.ent2_id)"' < politiquices_data_v3.0.jsonl | tr ' ' '\n' | sort | uniq -c | sort -gr
 
-
-\begin{comment}
-\begin{table}
-    \begin{center}
-    \begin{tabular}{l r}
-	\multicolumn{2}{c}{\bfseries Named-Entities (surface strings)} \\
-	\hline
-    Nr. Named-Entities                 &  5 348  \\
-    Nr. Unique Named-Entities          &    754  \\
-    \ \ - with a Wikidata entry		   &    631  \\
-    \ \ - without a Wikidata entry     &    129  \\
-                                       &         \\
-	\multicolumn{2}{c}{\bfseries Named-Entities per Wikidata entry} \\
-	\hline
-	Mean      						   &  1.387 \\
-	Std. Dev. 						   &  0.614 \\
-	Mode      						   &  1 \\
-	Median   						   &  1 \\   
-    \hline
-    \end{tabular}
-	\caption{Named-Entities and Wikidata entries.}
-	\label{tab:named_entities_linked}
-	\end{center}
-\end{table}
-\end{comment}
-
+Das 6648 menções a nomes de personalidades políticas apenas 708 são distintas, significando que há personalidades referidas com bastante frequência. Das 708 personalidades distintas, 517 têm um identificador na Wikidata sendo 191 não estão associadas a nenhum um identificador, por não estarem presentes na Wikidata.
 
 \section{Processo de Extracção de Relações}
 \label{sec:classifiers}
 
-O processo de extração de triplos em formato Resource Description Framework (RDF)~\citep{schreiber2014primer} a partir dos títulos das notícias envolve 4 componentes, nomeadamente: reconhecimento de entidades-mencionadas, ligação das entidades com um identificador da Wikidata presente na Base de Conhecimento (BC), classificação do tipo de relação e da sua direcção. Nesta secção descrevemos em detalhe cada um destes componentes.
+O processo de extração de triplos em formato Resource Description Framework (RDF)~\citep{schreiber2014primer} a partir dos títulos das notícias envolve 4 processos: 
 
+\begin{itemize}
+\item reconhecimento de entidades-mencionadas do tipo \texttt{PESSOA} nos títulos
+\item ligação das entidades com um identificador da Wikidata presente na Base de Conhecimento (BC)
+\item classificação do tipo de relação
+\item classificação da direcção da relação
+\end{itemize}
+
+Nesta secção descrevemos em detalhe cada um destes processos.
 
 \subsection{Reconhecimento de Entidades}
 \label{subsec:ner}
 
+% https://spacy.io/usage/rule-based-matching
+
 O reconhecimento de entidades mencionadas é baseado num método híbrido combinando regras com um modelo supervisionado. 
 
-Usando a componente \texttt{EntityRuler}\footnote{\url{https://spacy.io/usage/rule-based-matching}} do spaCy 3.0, definimos uma série de regras combinando padrões baseados nos nomes de todas as personalidades da BC. Para detectar as entidades do tipo pessoa este classificador aplica primeiro as regras e de seguida o modelo supervisionado para Português do spaCy.
+Usando a componente \texttt{EntityRuler}\footnote{\url{https://spacy.io/usage/rule-based-matching}} do spaCy 3.0, definimos uma série de regras combinando padrões baseados nos nomes de todas as personalidades da BC. Para detectar as entidades do tipo pessoa este classificador aplica primeiro as regras e de seguida o modelo supervisionado para Português do spaCy. Em situações de desacordo entra as duas abordagens as entidades marcadas com regras têm prioridade.
 
-\textbf{TODO: quem decide o que é final? as regras ou o modelo?}
+A Tabela~\ref{tab:results_ner} mostra a performance para as 3 abordagens sob o conjunto de dados anotado, contendo 6 648 menções a nomes de personalidades políticas.
 
-A Tabela~\ref{tab:results_ner} mostra a performance para as 3 abordagens sob o conjunto de dados anotado, contendo {\bf XXXX} personalidades políticas.
+% jq -r '"\(.ent1)|\(.ent2)"' < politiquices_data_v3.0.jsonl | tr '|' '\n' | wc -l
 
 \begin{table}[!h]
     \begin{center}
@@ -297,7 +273,6 @@ A Tabela~\ref{tab:results_ner} mostra a performance para as 3 abordagens sob o c
 	\label{tab:results_ner}
 	\end{center}
 \end{table}
-
 
 \subsection{Ligação com a Wikidata}
 \label{subsec:ent_linking}
@@ -317,7 +292,6 @@ Caso contrário a entidade expandida é usada para recolher uma nova lista de ca
 % A figura~\ref{fig:entity_linking} mostra um exemplo.
 
 % Algoritmo~\ref{lst:alg3} descreve esta segunda abordagem em pseudo-código python.{lst:alg3}
-
 
 % TODO: algoritmo
 \begin{comment}
@@ -397,15 +371,12 @@ def article_text(expanded, candidates):
 
 Os resultados desta abordagem sobre o conjunto de dados anotados e descritos na Secção~\ref{sec:rel_data_annot} são descritos na Tabela~\ref{tab:ent_linking_results}. A classificação \textit{incorrecta} corresponde a personalidades que não foram associadas ao identificador correcto na Wikidata, \textit{não desambiguada} para as que o algoritmo não conseguiu chegar a um identificador único ou não encontrou nenhum identificador na BC.
 
-São relatadas duas avaliações diferentes, Eval. 1 são os resultados para o algoritmo, tal como descrito acima. Eval. 2 é o mesmo algoritmo mas com dois mapeamentos baseados em contagens à priori sobre todas as notícias recolhidas, concretamente: \textit{Cavaco} para \textit{Cavaco Silva} e \textit{Marques Mendes} para \textit{Luís Marques Mendes}.
-
-\textbf{TODO: explicar como foram feitas as contagens à priori}
-
+Na Tabela~\ref{tab:ent_linking_results} são também reportadas duas avaliações, a primeira coluna descreve os resultados para o algoritmo, tal como descrito acima. A colune a priori é o mesmo algoritmo mas considerando as contagens a priori das referências as entidades mencionadas para com a personalidade que representam na Wikidata. Estas contagens são usadas para desambiguação. Por exemplo, todas as personalidades referidos pelo nome \textit{Cavaco} correspondem à personalidade \textit{Cavaco Silva}, usando este conhecimento, no processo de desambiguação todas as referências as \textit{Cavaco} são mapeadas para \textit{Cavaco Silva}, da mesma forma de todas as menções a \textit{Marques Mendes} correspondem à personalidade \textit{Luís Marques Mendes}. Usando estes mapeamentos, como mostra segunda coluna da Tabela~\ref{tab:ent_linking_results} conseguimos aumentar a exactidão, reduzindo o número de entidades correctamente desambiguadas.
 
 \begin{table}
     \begin{center}
     \begin{tabular}{l rr}
-        {\bf Classificação} & {\bf Eval. 1} & {\bf Eval. 2} \\
+        {\bf Classificação} &               & {\bf a priori} \\
         \hline
         correcta            &   5059        &  5136    \\
         incorrecta          &     43        &    43    \\
@@ -418,43 +389,28 @@ São relatadas duas avaliações diferentes, Eval. 1 são os resultados para o a
 	\end{center}
 \end{table}
 
-
 \subsection{Classificador de Tipo de Relação}
 \label{subsec:rel_classifier}
 
-Decidimos decompor a tarefa de classificação do tipo de relação, descritas na Tabela~\ref{tab:rel_dataset}, em dois classificadores diferentes: um classificador para o tipo de relação e outro para a direcção da relação, por oposição a treinar um único classificador que teria que distinguir de entre 5 classes. Esta secção descreve o classificador do tipo de relação presente num título, tendo 3 classes possíveis: \textbf{opõe-se}, \textbf{apoia} e \textbf{outra}.
+Decidimos decompor a tarefa de classificação do tipo de relação, descritas na Tabela~\ref{tab:rel_dataset}, em dois classificadores diferentes: um classificador para o tipo de relação e outro para a direcção da relação, por oposição a treinar um único classificador que teria que distinguir de entre 5 classes. Esta secção descreve o classificador do tipo de relação presente num título, tendo 3 classes possíveis: \textbf{opõe-se}, \textbf{apoia} e \textbf{outra}. Todas as experiências descritas foram feitas com uma avaliação cruzada de 4 partições, os resultados reportados são dos resultados sobre todos os conjuntos de teste.
 
-Todas as experiências descritas foram feitas com uma avaliação cruzada de 4 partições, os resultados reportados são dos resultados sobre todos os conjuntos de teste.
+Experimentamos e avaliámos diferentes abordagens para classificação supervisionada das relações presentes nos títulos, nomeadamente: um classificador SVM~\citep{cortes1995support} com um \textit{kerne}l linear, uma rede neuronal recorrente do tipo LSTM~\citep{10.1162/neco.1997.9.8.1735}, e uma rede neuronal do tipo \textit{transformer}, o DistilBERT~\citep{9463516}.
 
-\begin{table}[!h]
-    \begin{center}
-    \begin{tabular}{l cccr}
-        {\bf Relação} & {\bf P\textsubscript{1}}&  {\bf P\textsubscript{2}}  & {\bf P\textsubscript{3}} & {\bf P\textsubscript{4}} \\
-        \hline
-        opõe-se          &  xxx  &  xxx  &  xxx  & xxx \\
-        outra            &  xxx  &  xxx  &  xxx  & xxx \\
-        apoia            &  xxx  &  xxx  &  xxx  & xxx \\
-		\hline
-    \end{tabular}
-	\caption{Número de relações por partição}
-	\end{center}
-\end{table}
+Para o classificador SVM utilizámos como \textit{features} uma abordagem baseada em vectores TF-IDF~\citep{DBLP:journals/ipm/SaltonB88}, fazendo um pré-processamento do título, usando uma padrão, de modo a identificar o contexto relevante, i.e.: o contexto no título que contem informação para identificar a relação: \texttt{<Ent\textsubscript{1} X Ent\textsubscript{2} \textbf{contexto}>} onde \texttt{X} = \{\textit{“diz a”, “responde a”, “sugere a”, “diz que, “afirma que”, “espera que”, “defende que”, “considera que”, “sugere que”, “quer saber se”, “considera”, “manda”}\}. Sempre que não conseguimos extrair um contexto relevante usamos todas as palavras do título excepto o nome das personalidades.
+
+A rede neuronal recorrente LSTM foi usada numa arquitectura bidireccional, ou seja duas LSTMs, ambas com uma dimensão de 128, uma lendo o título da primeira para a última palavra e outra da última para a primeira palavra, sendo que os dois estados finais de cada LSTM são depois concatenados e passados para um \textit{layer} linear. Usamos \textit{embeddings} pré-treinados para Português baseados no método FastText (skip-gram) de dimensão 50, disponibilizados por~\cite{hartmann-etal-2017-portuguese}. A rede foi treinada durante 5 \textit{epochs} com um \textit{batch size} de tamanho 8.
+%optimizer = optim.Adam(model.parameters())
+%criterion = nn.BCELoss()
+
+O modelo DistilBERT foi treinado tendo como base um modelo pré-treinado para português~\citep{abdaoui-etal-2020-load}, sendo que foi depois afinado no conjunto de dados anotado, i.e.: os pesos de todos os \textit{layers} pré-treinados from actualizados tendo em conta a tarefa de classificação da relação. A rede foi treinada durante 5 \textit{epochs} com um \textit{batch size} de tamanho 8.
+%optimizer = optim.Adam(model.parameters())
+%tipo de loss function? nn.BCEWithLogitsLoss(pos_weight=self._class_weights)
 
 
-Experimentamos e avaliámos diferentes abordagens para classificação supervisionada das relações presentes nos títulos, nomeadamente: um classificador SVM~\citep{cortes1995support} com um kernel linear, uma rede neuronal recorrente do tipo LSTM~\citep{10.1162/neco.1997.9.8.1735}, e uma rede neural do tipo \textit{transformer}, o DistilBERT~\citep{9463516}.
-
-Para o SVM utilizámos como \textit{features} uma abordagem baseada em vectores TF-IDF~\citep{DBLP:journals/ipm/SaltonB88}.
-
-Com a rede neuronal recorrente LSTM usamos uma arquitectura bidireccional e os \textit{embeddings} pré-treinados para Português disponibilizados por~\cite{hartmann-etal-2017-portuguese}.
-
-O modelo DistilBERT foi treinado tendo como base o modelo % https://aclanthology.org/2020.sustainlp-1.16.pdf
-
-
-\begin{table}[!h]
-    \begin{center}
+\begin{table}
+    \begin{subtable}[c]{.5\textwidth}
+    \centering
     \begin{tabular}{l ccc}
-		\multicolumn{4}{c}{SVM}\\
-		\hline
         {\bf Relação} & {\bf P} & {\bf A} & {\bf F\textsubscript{1}} \\
 		\hline
         opõe-se          &  0.71  &  0.69  &  0.70   \\
@@ -463,16 +419,13 @@ O modelo DistilBERT foi treinado tendo como base o modelo % https://aclanthology
 		\hline
 		Macro-Média      &	0.69  &  0.69  &  0.69   \\
     \end{tabular}
-	%\caption{(P)recisão, A(brangência) e F\textsubscript{1} para uma avaliação com 4-partições e validação cruzada.}
-	\end{center}
-\end{table}
-
-
-\begin{table}[!h]
-    \begin{center}
+    \caption{SVM com um kernel linear\label{tbl:svmlinearaccuracy}}
+    \vspace{5mm}           
+    \end{subtable}
+\quad%  
+    \begin{subtable}[c]{.5\textwidth}
+    \centering
     \begin{tabular}{l ccc}
-		\multicolumn{4}{c}{bi-LSTM}\\
-		\hline
         {\bf Relação} & {\bf P} & {\bf A} & {\bf F\textsubscript{1}} \\
 		\hline
         opõe-se          &  0.75  &  0.64  &  0.69   \\
@@ -481,15 +434,13 @@ O modelo DistilBERT foi treinado tendo como base o modelo % https://aclanthology
 		\hline
 		Macro-Média      &  0.69  &  0.68  &  0.68   \\
     \end{tabular}
-	\end{center}
-\end{table}
-
-
-\begin{table}[!h]
-    \begin{center}
+    \caption{LSTM bi-direccional\label{tbl:bilstm}}
+    \vspace{5mm}     
+    \end{subtable}
+\quad%   
+    \begin{subtable}[c]{.5\textwidth}
+    \centering
     \begin{tabular}{l ccc}
-		\multicolumn{4}{c}{DistilBERT}\\
-		\hline
         {\bf Relação} & {\bf P} & {\bf A} & {\bf F\textsubscript{1}} \\
 		\hline
         opõe-se          &  0.74  &  0.76  &  0.75   \\
@@ -498,39 +449,37 @@ O modelo DistilBERT foi treinado tendo como base o modelo % https://aclanthology
 		\hline
 		Macro-Média      &  0.73  &  0.72  &  0.72   \\
     \end{tabular}
-	\end{center}
+    \caption{DistilBERT \label{tbl:distilbert}}
+    \end{subtable}
+  \caption{(P)recisão, A(brangência) e F\textsubscript{1} para uma avaliação com 4-partições e validação cruzada com diferentes classificadores.}
+  \label{tab:results_relacao}
 \end{table}
 
 
+A Tabela~\ref{tab:results_relacao} descreve os resultados para os vários classificadores. Os resultados mostram que não há diferenças muito acentuadas em termos de performance entre os 3 classificadores, embora a abordagem usando o DistilBERT tenha alcançado os melhores resultados. Ao analisar os resultados notamos que um desafio importante é classificar correctamente títulos que contêm expressões idiomáticas, por exemplo:
 
-
-
-% difficulty, challenge due to
-
-% idiomatic expressions
-%
-% José Lello diz que Nogueira Leite quer "abifar uns tachos"	ent1_opposes_ent2
-% Jerónimo de Sousa: Passos Coelho "não dá a cara com a careta"
-% Louçã diz que “António Borges é o grilo falante” de Passo Coelho	ent1_opposes_ent2
-% Louçã acusa Passos de ser o “cangalheiro da melhor maternidade” do país	ent1_opposes_ent2
+\begin{itemize}
+\item{\textit{José Lello diz que Nogueira Leite quer “abifar uns tachos”}}
+\item{\textit{Jerónimo de Sousa: Passos Coelho “não dá a cara com a careta”}}
+\item{\textit{Louçã diz que “António Borges é o grilo falante” de Passo Coelho}}
+\item{\textit{Louçã acusa Passos de ser o “cangalheiro da melhor maternidade” do país}}
+\end{itemize}
 
 % difficult to extract the exact context, syntactic parsing
-%
 % Socialistas aprovam voto de protesto contra elogios de Jaime Gama a Alberto João Jardim
 % Nobre Guedes apela a levantamento popular para impedir entrada de Sócrates em Coimbra
-
 % Francisco Lopes aponta convergência entre Cavaco e Alegre no rumo que levou ao 'afundamento' do país
 % oposses both persons
-
 % não anotei felicita qnd ganha eleicoes, nem 
-
 
 \subsection{Classificador de Direção da Relação}
 \label{subsec:rel_direction}
 
-Este classificador tem 2 classes possíveis. O conjunto de dados tem um viés para com a classe Ent\textsubscript{1} $\rightarrow$ Ent\textsubscript{2}, como mostra a Tabela~\ref{tab:rel_dataset} representando 91,5\% dos dados. Assim, optamos por desenvolver uma abordagem baseada em regras para detectar apenas a classe Ent\textsubscript{2}$\leftarrow$Ent\textsubscript{1}, e sempre que nenhuma das regras se verifica o classificador atribui a classe Ent\textsubscript{1} $\rightarrow$ Ent\textsubscript{2} por omissão.
+Como descrito na secção anterior, a da relação presente nos títulos é decomposta em duas tarefas: classificar o tipo de relação, e a direcção da relação. Esta secção descreve o segundo classificador. Este classificador tem 2 classes possíveis, Ent\textsubscript{1} $\rightarrow$ Ent\textsubscript{2} ou Ent\textsubscript{2}$\leftarrow$Ent\textsubscript{1}.
 
-As regras são baseado em padrões construídos com informação morfológica e sintáctica~\citep{nivre-etal-2020-universal} extraída do título com o spaCy e usando o mesmo modelo usado para reconhecimento de nomes de personalidades. Extraímos a informação morfo-sintáctica de todas as palavras, incluindo para os verbos informação sobre a conjugação: a pessoa e o número.
+O conjunto de dados tem um viés para com a classe Ent\textsubscript{1} $\rightarrow$ Ent\textsubscript{2}, como mostra a Tabela~\ref{tab:rel_dataset} representando 91,5\% dos dados. Assim, optamos por desenvolver uma abordagem baseada em regras para detectar apenas a classe Ent\textsubscript{2}$\leftarrow$Ent\textsubscript{1}, e sempre que nenhuma das regras se verifica o classificador atribui a classe Ent\textsubscript{1} $\rightarrow$ Ent\textsubscript{2} por omissão.
+
+As regras são baseado em padrões construídos com informação morfológica e sintáctica~\citep{nivre-etal-2020-universal} extraída do título com o spaCy e usando o mesmo modelo usado para reconhecimento de nomes de personalidades, ~\texttt{pt\_core\_news\_lg-3.0.0}. Extraímos a informação morfo-sintáctica de todas as palavras, incluindo para os verbos informação sobre a conjugação: a pessoa e o número.
 
 \begin{itemize}
 
@@ -546,26 +495,9 @@ As regras são baseado em padrões construídos com informação morfológica e 
 
 \end{itemize}
 
-Os padrões são aplicados de forma sequencial, pela mesma ordem que são descritos, e se nenhum deles corresponde ao título, classificamos o título como {Ent\textsubscript{1} $\rightarrow$ Ent\textsubscript{2}}. A Tabela~\ref{tab:direction_clf_results} contem os resultados deste classificador baseado em padrões para o conjunto de dados anotados.
-
-\begin{table}[!h]
-    \begin{center}
-    \begin{tabular}{l cccr}
-        {\bf Direction} & {\bf P} & {\bf A} & {\bf F\textsubscript{1}} & {\bf \#Títulos} \\
-        \hline
-        \small{Ent\textsubscript{1} $\rightarrow$ Ent\textsubscript{2}} & 0.99  &  1.00  &  0.99  & 1488 \\
-		\small{Ent\textsubscript{1} $\leftarrow$ Ent\textsubscript{2}}  & 0.95  &  0.84  &  0.89  & 129  \\
-		\hline
-	    weighted avg.     &      0.98       & 0.98       & 0.98		&   1517 \\
-    \end{tabular}
-	\caption{(P)recisão, A(brangência) e F\textsubscript{1} usando 3 regras baseadas em padrões.}
-	\label{tab:direction_clf_results}
-	\end{center}
-\end{table}
-
 A Tabela~\ref{tab:examples_patterns_direction} mostra alguns exemplos de títulos de notícias e das regras que foram aplicadas para detectar a direcção {Ent\textsubscript{1} $\leftarrow$ Ent\textsubscript{2}.
 
-\begin{table*}[!ht]
+\begin{table*}[!h]
   \centering
   \begin{tabular}{lc}
       {\bf Título} & {\bf Regra Aplicada} \\
@@ -583,6 +515,23 @@ A Tabela~\ref{tab:examples_patterns_direction} mostra alguns exemplos de título
   \label{tab:examples_patterns_direction}
 \end{table*}
 
+
+Os padrões são aplicados de forma sequencial, pela mesma ordem que são descritos, e se nenhum deles corresponde ao título, classificamos o título como {Ent\textsubscript{1} $\rightarrow$ Ent\textsubscript{2}}. A Tabela~\ref{tab:direction_clf_results} contem os resultados deste classificador baseado em padrões para o conjunto de dados anotados.
+
+\begin{table}
+    \begin{center}
+    \begin{tabular}{l cccr}
+        {\bf Direction} & {\bf P} & {\bf A} & {\bf F\textsubscript{1}} & {\bf \#Títulos} \\
+        \hline
+        \small{Ent\textsubscript{1} $\rightarrow$ Ent\textsubscript{2}} & 0.99  &  1.00  &  0.99  & 1488 \\
+		\small{Ent\textsubscript{1} $\leftarrow$ Ent\textsubscript{2}}  & 0.95  &  0.84  &  0.89  & 129  \\
+		\hline
+	    weighted avg.     &      0.98       & 0.98       & 0.98		&   1517 \\
+    \end{tabular}
+	\caption{(P)recisão, A(brangência) e F\textsubscript{1} usando 3 regras baseadas em padrões.}
+	\label{tab:direction_clf_results}
+	\end{center}
+\end{table}
 
 \section{Grafo Semântico}
 \label{sec:pipeline}
@@ -667,7 +616,6 @@ Os triplos RDF gerados são então indexados num motor SPARQL~\citep{jena2015fre
 % 	 no_wiki_id.jsonl
 \end{comment}
 
-
 \section{Trabalho Futuro}
 \label{sec:future_work}
 
@@ -734,14 +682,13 @@ Os triplos RDF gerados são então indexados num motor SPARQL~\citep{jena2015fre
 	% Estudar os triângulos políticos: se as personalidades políticas X e Y sempre acusam ou defendem uma terceira personalidade Z, qual será a relação típica entre X e Y ?
 
 
-\newpage
-
+% A grande maioria das notícias tem como origem o arquivo da web portuguesa, através da sua \textit{API} que retorna o título e o HTML original da página. Limpar os dados, de forma a descartar todo o HTML e ter o corpo da notícia não é uma tarefa simples, especialmente considerando o variedade de domínios e o período temporal. Por esta razão optamos por focar a extracção de relações no título das notícias.
 
 \section*{Agradecimentos}
 
-% Os agradecimentos devem ser colocados sempre numa secção final, sem número, tal como neste exemplo. Sempre que o autor assim o entender, deverá agradecer aos revisores.
+Gostaríamos de agradecer ao Nuno Feliciano por todos os comentários dados na construção e elaboração deste trabalho.
 
-\newpage
+% Os agradecimentos devem ser colocados sempre numa secção final, sem número, tal como neste exemplo. Sempre que o autor assim o entender, deverá agradecer aos revisores.
 
 \bibliography{references.bib}
 
