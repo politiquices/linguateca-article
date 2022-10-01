@@ -10,9 +10,9 @@
 \usepackage{makecell} % for formating column heads
 \renewcommand\theadfont{\bfseries}
 \usepackage{subcaption}	% for \subtable
-\usepackage{graphicx} % http://ctan.org/pkg/graphicx
-%\usepackage{listings} % see below
-%\renewcommand{\lstlistingname}{Algorithm}% rename caption: Listing -> Algorithm
+%\usepackage{graphicx} % http://ctan.org/pkg/graphicx
+\usepackage{listings} % see below
+\usepackage[]{program}
 \usepackage{color}
 \usepackage{multirow}
 
@@ -24,8 +24,6 @@
 %% Other languages will be created on a required basis.
 
 \bibliographystyle{sp_por}   % This for Portuguese
-% \bibliographystyle{sp_esp} % This for Castilian
-% \bibliographystyle{sp_cat} % This for Catalan
 
 
 %% You can leave this unchanged. It will be updated by the editors when your paper gets published.
@@ -111,9 +109,9 @@ Todas as relações extraídas são representadas sob a forma de triplos semânt
 As principais contribuições deste trabalho são: 
 
 \begin{itemize}
-\item{um gráfico semântico RDF ligando personalidades políticas representadas na Wikidata através de uma relação de oposição ou apoio suportada por uma notícia}
-\item{um conjunto de dados anotados utilizado para treinar os classificadores de extração das relações de títulos de notícias, e ligar as personalidades mencionadas à Wikidata}
-\item{um interface web que permite explorar o gráfico semântico, permitindo filtrar o tipo de relações, o período de tempo das notícias, e o peso de uma relação, ou seja, o número de noticias que suportam uma relação entre duas personalidades.}
+\item{um grafo semântico ligando personalidades políticas representadas na Wikidata através de uma relação de oposição ou apoio suportada por uma notícia}
+\item{um conjunto de dados anotados utilizado para treinar os classificadores de extracção das relações de títulos de notícias, e ligar as personalidades mencionadas à Wikidata}
+\item{um interface web que permite explorar o gráfico semântico}
 \end{itemize}
 
 Este artigo está organizado da seguinte forma: na Secção~\ref{sec_related_work} referimos trabalho relacionado, na Secção~\ref{sec_kb} descrevemos a Base de Conhecimento usado no suporte de ligação das personalidades políticas à Wikidata. A Secção~\ref{sec:data_sources} refere e descreve as fontes de notícias utilizadas. Na Secção~\ref{sec:rel_data_annot} detalhamos o conjunto de dados anotados e na Secção~\ref{sec:classifiers} os classificadores de aprendizagem supervisionada desenvolvidos. Na Secção~\ref{sec:pipeline} descrevemos o processo extracção de triplos e a construção do gráfico semântico. Finalmente, na Secção~\ref{sec:future_work} apresentamos ideias futuras para melhorar e continuar este trabalho.
@@ -277,103 +275,81 @@ A Tabela~\ref{tab:results_ner} mostra a performance para as 3 abordagens sob o c
 \subsection{Ligação com a Wikidata}
 \label{subsec:ent_linking}
 
-O procedimento para ligar as personalidades com a Wikidata tenta primeiro encontrar o identificador da Wikidata correcto na BC analisando apenas o título da notícia, se este processo falhar, tenta usar possíveis referências à mesma personalidade no texto da notícia.
+O procedimento para associar as personalidades com identificadores na Wikidata tenta numa primeira fase usar apenas o título da notícia, se este processo falhar, tenta então usar possíveis referências às personalidades no texto da notícia. A similaridades entre candidatos da BC e as personalidades referidos no texto são calculadas com a similaridade Jaro~\citep{jaro1989}.
 
-Numa primeira fase o algoritmo começa por gerar uma lista de candidatos, para uma determinada personalidade usando a BC. Se a lista contem apenas um candidato e a similaridade Jaro~\citep{jaro1989} entre a personalidade e o candidato é de pelo menos 0,8 esse candidato é seleccionado. Se houver mais do que um candidato o algoritmo filtra apenas aqueles com uma similaridade de 1,0 e se houver apenas um esse é o candidato seleccionado. 
+Na primeira fase o algoritmo começa por gerar uma lista de candidatos, para uma determinada personalidade usando a BC. Se a lista contem apenas um candidato e a similaridade para com a personalidade referida no título é de pelo menos 0,8 esse candidato é seleccionado. Se houver mais do que um candidato o algoritmo filtra apenas aqueles com uma similaridade de 1,0 e se houver apenas um esse é o candidato seleccionado. Em qualquer outro caso nenhum candidato é retornado. O Algoritmo~\ref{lst:alg1} descreve este procedimento usando apenas o título da notícia.
 
-Se nenhum candidato for gerado na primeira fase, o algoritmo tenta expandir as entidades mencionadas no título com base no texto da notícia, explorando o padrão em que uma personalidade mencionada no título por um versão curta do seu nome é também referida no texto da notícia por um nome mais completo. \textbf{TODO: adicionar um exemplo}
-
-O algoritmo começa por identificar todas as pessoas mencionadas no texto da notícia, usando a componente descrita na secção~\ref{subsec:ner} descartando todas que não têm pelo menos um nome em comum com a personalidade a ser desambiguada.  Se do processo de expansão resulta mais do que uma entidade expandida, escolhemos o candidato da BC  com uma similaridade 1.0 para com a entidade expandida, se existir. 
-
-Se do processo resulta apenas uma entidade expandida e se há uma similaridade de 1.0 com apenas um dos candidatos anteriormente seleccionados da BC, esse candidato é escolhido. 
-
-Caso contrário a entidade expandida é usada para recolher uma nova lista de candidatos da BC, se nessa lista apenas há um candidato e a sua similaridade Jaro é de pelo menos 0.8 com a entidade expandida, esse candidato é escolhido. Se há mais do que um candidatos e apenas um tem uma similaridade 1.0 com a entidade expandida esse é escolhido. Em qualquer outro caso nenhum candidato é retornado.
-
-% A figura~\ref{fig:entity_linking} mostra um exemplo.
-
-% Algoritmo~\ref{lst:alg3} descreve esta segunda abordagem em pseudo-código python.{lst:alg3}
-
-% TODO: algoritmo
-\begin{comment}
-\begin{lstlisting}[language=python,columns=fullflexible,label={lst:alg1},caption=Entity-Linking approach.]]
-def entity_linking(person, url):
-    candidates = get_candidates(person)
-    wiki_id = title_only(person, candidates)
-    if not wiki_id:
-        news_text = get_text(text)
-        expanded = expand_entity(person, news_text)
-        wiki_id = article_text(person, candidates, expanded)
-    return wiki_id
-\end{lstlisting}
-\end{comment}
-
-\begin{comment}
-\begin{lstlisting}[language=python,columns=fullflexible,label={lst:alg2},caption=Headline approach.]]
-def title_only(person, candidates):
+\begin{lstlisting}[language=python,columns=fullflexible,frame=single,label={lst:alg1},title={Algoritmo 1. Ligação com a Wikidata usando apenas o título.},captionpos=b]
+def title_only(ent, candidates):
     wiki_id = None
     if len(candidates) == 1:
-        if fuzzy(person,candidades[0]):
+        if jaro(per,candidates[0]) >= 0.8:
             wiki_id = candidates[0]
     else:
-        if len(matches := exact(person, candidates)) == 1:
-            wiki_id = candidates[0]
+        filtered = exact(ent, candidates):
+	if len(filtered) == 1:
+	    wiki_id = candidates[0]
     return wiki_id
 \end{lstlisting}
-\end{comment}
 
-\begin{comment}
-\begin{lstlisting}[language=python,columns=fullflexible,label={lst:alg3},caption=News text approach.]]
+Se nenhum candidato for gerado na primeira fase, o algoritmo tenta expandir as entidades mencionadas no título com base no texto da notícia, explorando o padrão em que tipicamente se uma personalidade é mencionada no título por uma versão simples do seu nome é referida no texto da notícia por um nome mais completo.
+
+O algoritmo começa por identificar todas as pessoas mencionadas no texto da notícia, usando a componente descrita na Secção~\ref{subsec:ner} e selecionando apenas as que têm pelo menos um nome em comum com a personalidade a ser associada à Wikidata. 
+
+Se do processo resulta apenas uma entidade expandida e se há uma similaridade de 1.0 com um dos candidatos anteriormente seleccionados da BC, esse candidato é escolhido. Caso contrário a entidade expandida é usadas para recolher uma nova lista de candidatos da BC, se nessa lista apenas há um candidato e a sua similaridade é de pelo menos 0.8 para com a entidade expandida, esse candidato é escolhido. Se há mais do que um candidatos e apenas um tem uma similaridade 1.0 com a entidade expandida esse é escolhido. 
+
+Se do processo de expansão resultam várias entidades expandidas, filtramos candidatos da BC com similaridade 1.0 para com a entidade expandida, se existir apenas um, esse candidato é o escolhido. Em qualquer outro caso não abrangido pelo algoritmo nenhum candidato é retornado. 
+
+O Algoritmo~\ref{lst:alg2} descreve este procedimento usando o texto da notícia.
+
+\begin{lstlisting}[language=python,columns=fullflexible,frame=single,label={lst:alg2},title={Algoritmo 2. Ligação com a Wikidata usando o texto da notícia para expandir as entidades reconhecidas no título.},captionpos=b]]
 def article_text(expanded, candidates):
-    if len(expanded) == 1:
-        per_expanded = expanded[0]
-        matches = exact(per_expanded, candidates)
-        if len(matches) == 1:
-            return matches[0]
-
-        new_candidates = get_candidates(expanded)
-        if len(new_candidates) == 1:
-            if fuzzy(per_expanded, new_candidates[0]):
-                return candidates[0]
+  if len(expanded) == 1:
+    filtered = exact(expanded[0], candidates)
+	if len(filtered) == 1:
+	  return filtered[0]
+	  
+    new_candidates = get_candidates(expanded)
+    if len(new_candidates) == 1:
+      if jaro(expanded, new_candidates[0])>=0.8:
+	    return candidates[0]
  
-        matches = exact(per_expanded, new_candidates)
-    	if len(matches) == 1:
-            return matches[0]
+    filtered = exact(expanded, new_candidates)
+    if len(filtered) == 1:
+      return matches[0]
+  
+  if len(expanded) > 1:
+    filtered = []
+    for e in expanded:
+      filtered.extend(exact(e, candidates))
+    if len(filtered) == 1:
+      return filtered[0]
 
-    if len(expanded) > 1:
-        exact_matches = []
-        for e in expanded:
-            exact_matches.extend(exact(e, candidates))
-    	if len(matches) == 1:
-            return matches[0]
-
-    return None
+  return None
 \end{lstlisting}
-\end{comment}
 
-% TODO: figuras
+
 \begin{comment}
-\begin{figure}
-\centering
 
-\subfloat{
-	\label{subfig:correct}
-	\includegraphics[width=0.45\textwidth]{entity_linking_title.png} } 
+\begin{lstlisting}[language=python,columns=fullflexible,label={lst:alg3},caption=News text approach.]]
 
-\subfloat{
-	\label{subfig:notwhitelight}
-	\includegraphics[width=0.45\textwidth]{entity_linking_body} } 
-	
-\caption{The same person \textit{Jardim}, mentioned in the headline and body, with different surface strings.}
-\label{fig:entity_linking}
+def entity_linking(per):
+    candidates = get_candidates(ent)
+    wiki_id = title_only(per, candidates)
+    if not wiki_id:
+        expanded = expand(per, news_text)
+        wiki_id = article_text(candidates, expanded)
+    return wiki_id
+\end{lstlisting}
 
-\end{figure}
 \end{comment}
+
 
 Os resultados desta abordagem sobre o conjunto de dados anotados e descritos na Secção~\ref{sec:rel_data_annot} são descritos na Tabela~\ref{tab:ent_linking_results}. A classificação \textit{incorrecta} corresponde a personalidades que não foram associadas ao identificador correcto na Wikidata, \textit{não desambiguada} para as que o algoritmo não conseguiu chegar a um identificador único ou não encontrou nenhum identificador na BC.
 
-Na Tabela~\ref{tab:ent_linking_results} são também reportadas duas avaliações, a primeira coluna descreve os resultados para o algoritmo, tal como descrito acima. A colune a priori é o mesmo algoritmo mas considerando as contagens a priori das referências as entidades mencionadas para com a personalidade que representam na Wikidata. Estas contagens são usadas para desambiguação. Por exemplo, todas as personalidades referidos pelo nome \textit{Cavaco} correspondem à personalidade \textit{Cavaco Silva}, usando este conhecimento, no processo de desambiguação todas as referências as \textit{Cavaco} são mapeadas para \textit{Cavaco Silva}, da mesma forma de todas as menções a \textit{Marques Mendes} correspondem à personalidade \textit{Luís Marques Mendes}. Usando estes mapeamentos, como mostra segunda coluna da Tabela~\ref{tab:ent_linking_results} conseguimos aumentar a exactidão, reduzindo o número de entidades correctamente desambiguadas.
+Na Tabela~\ref{tab:ent_linking_results} são também reportadas duas avaliações, a primeira coluna descreve os resultados para o algoritmo, tal como descrito acima. A coluna a priori é o mesmo algoritmo mas considerando as contagens a priori das referências às entidades mencionadas para com a personalidade que representam na Wikidata. As contagens são usadas para desambiguação. 
 
-\begin{table}
+\begin{table}[!h]
     \begin{center}
     \begin{tabular}{l rr}
         {\bf Classificação} &               & {\bf a priori} \\
@@ -389,6 +365,9 @@ Na Tabela~\ref{tab:ent_linking_results} são também reportadas duas avaliaçõe
 	\end{center}
 \end{table}
 
+
+Por exemplo, nos dados anotados, todas as personalidades referidas pelo nome \textit{Cavaco} correspondem à personalidade \textit{Cavaco Silva}, usando este conhecimento, no processo de desambiguação todas as referências à \textit{Cavaco} são mapeadas para \textit{Cavaco Silva}, da mesma forma de todas as menções a \textit{Marques Mendes} correspondem à personalidade \textit{Luís Marques Mendes}. Usando estes mapeamentos, como mostra segunda coluna da Tabela~\ref{tab:ent_linking_results} conseguimos aumentar a exactidão, dado que reduzimos o número de entidades para as quais não conseguimos encontrar um mapeamento.
+
 \subsection{Classificador de Tipo de Relação}
 \label{subsec:rel_classifier}
 
@@ -402,7 +381,7 @@ A rede neuronal recorrente LSTM foi usada numa arquitectura bidireccional, ou se
 %optimizer = optim.Adam(model.parameters())
 %criterion = nn.BCELoss()
 
-O modelo DistilBERT foi treinado tendo como base um modelo pré-treinado para português~\citep{abdaoui-etal-2020-load}, sendo que foi depois afinado no conjunto de dados anotado, i.e.: os pesos de todos os \textit{layers} pré-treinados from actualizados tendo em conta a tarefa de classificação da relação. A rede foi treinada durante 5 \textit{epochs} com um \textit{batch size} de tamanho 8.
+O modelo DistilBERT foi treinado tendo como base um modelo pré-treinado para português~\citep{abdaoui-etal-2020-load}, sendo que foi depois afinado no conjunto de dados anotado, i.e.: os pesos de todos os \textit{layers} pré-treinados foram actualizados tendo em conta a tarefa de classificação da relação. A rede foi treinada durante 5 \textit{epochs} com um \textit{batch size} de tamanho 8.
 %optimizer = optim.Adam(model.parameters())
 %tipo de loss function? nn.BCEWithLogitsLoss(pos_weight=self._class_weights)
 
@@ -465,12 +444,23 @@ A Tabela~\ref{tab:results_relacao} descreve os resultados para os vários classi
 \item{\textit{Louçã acusa Passos de ser o “cangalheiro da melhor maternidade” do país}}
 \end{itemize}
 
-% difficult to extract the exact context, syntactic parsing
-% Socialistas aprovam voto de protesto contra elogios de Jaime Gama a Alberto João Jardim
-% Nobre Guedes apela a levantamento popular para impedir entrada de Sócrates em Coimbra
-% Francisco Lopes aponta convergência entre Cavaco e Alegre no rumo que levou ao 'afundamento' do país
-% oposses both persons
-% não anotei felicita qnd ganha eleicoes, nem 
+\begin{table*}
+  \centering
+  \begin{tabular}{lc}
+      {\bf Título} & {\bf Regra Aplicada} \\
+      \hline
+	  \textbf{Marques Júnior} elogiado por \textbf{Cavaco Silva} pela "integridade de carácter" & VOZ\_PASSIVA \\
+	  \textbf{Passos Coelho} é acusado de imaturidade política por \textbf{Santos Silva}  		& VOZ\_PASSIVA \\
+	  \textbf{António Costa} vive no "país das maravilhas" acusa \textbf{Assunção Cristas}      & VERBO\_ENT2 \\
+	  \textbf{Passos Coelho} "insultou 500 mil portugueses", acusa \textbf{José Sócrates}		& VERBO\_ENT2 \\ 
+	  \textbf{Maria Luís Albuquerque} sob críticas de \textbf{Luís Amado}						& NOUN\_ENT2 \\
+	  \textbf{André Ventura} diz-se surpreendido com perda de apoio de \textbf{Cristas}			& NOUN\_ENT2 \\
+
+	  \hline
+  \end{tabular}
+  \caption{Exemplos de títulos e quais as regras de padrões usadas para detectar a direcçao da relação.}
+  \label{tab:examples_patterns_direction}
+\end{table*}
 
 \subsection{Classificador de Direção da Relação}
 \label{subsec:rel_direction}
@@ -496,25 +486,6 @@ As regras são baseado em padrões construídos com informação morfológica e 
 \end{itemize}
 
 A Tabela~\ref{tab:examples_patterns_direction} mostra alguns exemplos de títulos de notícias e das regras que foram aplicadas para detectar a direcção {Ent\textsubscript{1} $\leftarrow$ Ent\textsubscript{2}.
-
-\begin{table*}[!h]
-  \centering
-  \begin{tabular}{lc}
-      {\bf Título} & {\bf Regra Aplicada} \\
-      \hline
-	  \textbf{Marques Júnior} elogiado por \textbf{Cavaco Silva} pela "integridade de carácter" & VOZ\_PASSIVA \\
-	  \textbf{Passos Coelho} é acusado de imaturidade política por \textbf{Santos Silva}  		& VOZ\_PASSIVA \\
-	  \textbf{António Costa} vive no "país das maravilhas" acusa \textbf{Assunção Cristas}      & VERBO\_ENT2 \\
-	  \textbf{Passos Coelho} "insultou 500 mil portugueses", acusa \textbf{José Sócrates}		& VERBO\_ENT2 \\ 
-	  \textbf{Maria Luís Albuquerque} sob críticas de \textbf{Luís Amado}						& NOUN\_ENT2 \\
-	  \textbf{André Ventura} diz-se surpreendido com perda de apoio de \textbf{Cristas}			& NOUN\_ENT2 \\
-
-	  \hline
-  \end{tabular}
-  \caption{Exemplos de títulos e quais as regras de padrões usadas para detectar a direcçao da relação.}
-  \label{tab:examples_patterns_direction}
-\end{table*}
-
 
 Os padrões são aplicados de forma sequencial, pela mesma ordem que são descritos, e se nenhum deles corresponde ao título, classificamos o título como {Ent\textsubscript{1} $\rightarrow$ Ent\textsubscript{2}}. A Tabela~\ref{tab:direction_clf_results} contem os resultados deste classificador baseado em padrões para o conjunto de dados anotados.
 
@@ -619,6 +590,13 @@ Os triplos RDF gerados são então indexados num motor SPARQL~\citep{jena2015fre
 \section{Trabalho Futuro}
 \label{sec:future_work}
 
+Neste artigo foi proposta uma abordagem de utilização de técnicas de extracção de informação de forma a criar bases de conhecimento, em larga escala, a partir de repositórios de documentos de texto. 
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
+
+
 % Review the dataset
 
 % - mostrar mais relações:
@@ -635,6 +613,13 @@ Os triplos RDF gerados são então indexados num motor SPARQL~\citep{jena2015fre
 %	- requerem contexto
 %	- usam expressoes idiomáticas ou irónicas
 
+
+% difficult to extract the exact context, syntactic parsing
+% Socialistas aprovam voto de protesto contra elogios de Jaime Gama a Alberto João Jardim
+% Nobre Guedes apela a levantamento popular para impedir entrada de Sócrates em Coimbra
+% Francisco Lopes aponta convergência entre Cavaco e Alegre no rumo que levou ao 'afundamento' do país
+% oposses both persons
+% não anotei felicita qnd ganha eleicoes, nem 
 
 \begin{comment}
 	% ent1 asks for action from ent2
@@ -673,14 +658,10 @@ Os triplos RDF gerados são então indexados num motor SPARQL~\citep{jena2015fre
 
 % Os dados anotados permitem que novos algoritmos sejam treinados para detectar relações e ligar as personalidades com a Wikidata, e servem de incentivo ao desenvolvimento de melhores algoritmos de processamento de linguagem natural no contexto de notícias de âmbito político em Português.
 
-% O grafo de relações permite a cientistas de áreas como: sociologia, ciência política e computação realizar diversos estudos, por exemplo: 
-
+% O grafo de relações permite a cientistas de áreas como: sociologia, ciência política e computação realizar diversos estudos, por exemplo:
 	% Encontrar comunidades de apoio e oposição em função do tempo e verificar se há  mudanças entre alianças e oposições
-
 	% Enriquecer as relações, categorizando-as num ou mais tópicos com base numa análise detalhada do texto da notícia
-
 	% Estudar os triângulos políticos: se as personalidades políticas X e Y sempre acusam ou defendem uma terceira personalidade Z, qual será a relação típica entre X e Y ?
-
 
 % A grande maioria das notícias tem como origem o arquivo da web portuguesa, através da sua \textit{API} que retorna o título e o HTML original da página. Limpar os dados, de forma a descartar todo o HTML e ter o corpo da notícia não é uma tarefa simples, especialmente considerando o variedade de domínios e o período temporal. Por esta razão optamos por focar a extracção de relações no título das notícias.
 
