@@ -10,7 +10,6 @@
 \usepackage{makecell} % for formating column heads
 \renewcommand\theadfont{\bfseries}
 \usepackage{subcaption}	% for \subtable
-%\usepackage{graphicx} % http://ctan.org/pkg/graphicx
 \usepackage{listings} % see below
 \usepackage[]{program}
 \usepackage{color}
@@ -64,7 +63,7 @@ Neste artigo descrevemos em detalhe processo de extracção de relações dos t�
 \end{resumo}
 
 %% Add keywords in the article main language, in lowercase
-\palavraschave{web semântica, RDF, PLN, relações semânticas, ciência política, dados anotados}
+\palavraschave{relações semânticas, web semântica, RDF, PLN, ciência política, dados anotados}
 
 \newpage
 
@@ -118,41 +117,28 @@ Este artigo está organizado da seguinte forma: na Secção~\ref{sec_related_wor
 
 \section{Trabalho Relacionado}
 \label{sec_related_work}
+A análise de sentimento tem sido maioritariamente alvo de estudo em conteúdo gerado em redes redes sociais~\citep{10.1145/3185045} ou na avaliação de produtos ou serviços~\citep{pontiki-etal-2016-semeval}. Nestes domínios o autor do texto e o alvo da opinião são explícitos. No entanto, este tipo de abordagem não se aplica no contexto de análise de notícias de política, onde existe com frequência um sentimento expresso entre actores políticos sob a forma de relações de apoio ou oposição~\citep{balahur2009opinion, balahur-etal-2010-sentiment}.
 
-A análise de sentimento no contexto de processamento de linguagem natural (PLN) tem sido maioritariamente alvo de estudo em conteúdo gerado em redes redes sociais~\citep{10.1145/3185045} ou na avaliação de produtos ou serviços~\citep{pontiki-etal-2016-semeval}. Nestes domínios o autor do texto e o alvo da opinião são explícitos. No entanto este tipo de abordagem não se aplica no contexto de análise de notícias de política, onde existe com frequência um sentimento expresso entre actores políticos sob a forma de relações de apoio ou oposição~\citep{balahur2009opinion, balahur-etal-2010-sentiment}.
+% 2013 - https://aclanthology.org/P13-1108.pdf Learning to Extract International Relations from Political Context
+% 2019 - https://aclanthology.org/N19-1167.pdf No Permanent Friends or Enemies: Tracking Relationships between Nations from News
+Vários autores exploraram métodos extrair relações de sentimento envolvendo actores políticos. Alguns autores exploram estas relações num contexto de política internacional, em que os actores políticos são  nações. \cite{oconnor-etal-2013-learning} propõem um modelo não supervisionado baseado em \textit{topic models} extraindo eventos ocorridos num determinado período de tempo envolvendo duas nações, e não um conjunto fechado de relações. \cite{han-etal-2019-permanent} geram de forma não supervisionada descritores de relações para pares de nações mencionadas em notícias recorrendo a \textit{embeddings} usados para ordenar o texto que descreve a relação.
 
+% Datasets
+% 2015 - https://aclanthology.org/W15-5614/ - An Annotated Corpus for Sentiment Analysis in Political News
+% 2021 - https://www.sciencedirect.com/science/article/pii/S1877050921018755 - A dataset for Sentiment analysis of Entities in News headlines (SEN)
+Alguns autores disponibilizam dados anotados, \cite{de-arruda-etal-2015-annotated} criaram um corpus de notícias políticas em português, anotando cada parágrafo com o sentimento segundo duas dimensões: o actor político referida pela notícia, e o sentimento dessa referência: positivo, negativo ou neutro. \cite{BARANIAK20213627} disponibilizam um corpus semelhantes para inglês e polaco.
+
+% 2017 - https://aclanthology.org/D17-1144.pdf
+\cite{cocarascu-toni-2017-identifying} propõem um método para classificar relações de apoio ou oposição de uma peça de texto para outra que ocorrem naturalmente num debate debate político.
+
+% 2019 - Who Blames Whom in a Crisis? Detecting Blame Ties from News Articles Using Neural Networks 
+% https://ojs.aaai.org/index.php/AAAI/article/view/3842/3720
+\cite{liang2019blames} define a tarefa de extracção de relações de culpabilidade: dado um artigo $d$ e um conjunto de entidades $e$, detectar se existe uma relação de culpabilidade $(s,t)$, onde $s \in e$ e $t \in e$, quando $s$ culpa $t$ com base no artigo $d$, sendo que há $|e| \cdot (|e| - 1)$ possíveis relações de culpabilidade.
+
+% 2021
 % Who Blames or Endorses Whom? Entity-to-Entity Directed Sentiment Extraction in News Text
 % https://aclanthology.org/2021.findings-acl.358/
-Alguns trabalhos exploram relações com sentimento positivo ou negativo entre entidades mencionadas em notícias. \cite{park-etal-2021-blames} define a tarefa de extracção de sentimento direccionada como: dada uma frase $s$ referindo duas entidades $p$ e $q$, detectar qual a relação de sentimentos entre $p$ e $q$ de entre cinco possíveis: neutra, $p$ tem uma opinião positiva ou negativa em relação a $q$, ou $q$ tem uma opinião positiva ou negativa em relação a $p$.
-
-% Os autores propõem resolver propõem uma abordagem simples mas eficaz de abordar o problema da extracção de sentimentos dirigida, a que chamamos DSE2QA; transformamos a tarefa tarefa extracção de sentimento direccionado em sub-tarefas que visam responder a perguntas de sim/não sobre se um sentimento alvo está incorporado no texto. A ideia básica é perguntar a uma máquina inteligente que possa responder sim/não a perguntas sobre se existe um sentimento alvo e depois combinar as respostas correspondentes a cada classe de sentimento para fazer um palpite final. 
-
-\cite{liang2019blames} define a tarefa de extração de relações de culpabilidade: dado um artigo $d$ e um conjunto de entidades $e$, detectar se existe uma relação de culpabilidade $(s,t)$, onde $s \in e$ e $t \in e$, quando $s$ culpa $t$ com base no artigo $d$, sendo que há $|e| \cdot (|e| - 1)$ possíveis relações de culpabilidade, .
-
-% https://aclanthology.org/P13-1108/
-% https://aclanthology.org/N19-1167/
-
-Outros autores exploram estas relações num contexto de política internacional entre nações. \cite{oconnor-etal-2013-learning} propõem um modelo não supervisionado baseado em \textit{topic models}~\cite{} extraindo eventos ocorridos num determinado período de tempo envolvendo duas nações, e não um conjunto fechado de relações. \cite{han-etal-2019-permanent} geram de forma não supervisionada descritores de relações para pares de nações mencionadas em notícias recorrendo a \textit{embeddings} usados para ordenar o text que descreve a relação.
-
-% take a set of documents and nation entity pairs as inputs and generate relationship descriptors for the entity pairs in an unsupervised setting. They are both trained in an encoder-decoder style training process in an unsupervised manner. Given new text with an entity pair, they generate d descriptor embeddings that are used to rank candidate descriptors.
-
-No contexto de análise de notícias de política em Português, e tanto quanto é do meu conhecimento, julgo este ser um dos primeiros trabalhos a propor um método para extrair de forma automática relações de apoio e oposição entre personalidades políticas de forma a poder construir um grafo semântico.
-
-% 2006
-% \citep{thomas-etal-2006-get} investigate whether one can determine from the transcripts of U.S. Congressional floor debates whether the speeches represent support of or opposition to proposed legislation. 
-%  determine from the transcripts of U.S. Congressional floor debates whether each “speech” (continuous single-speaker segment of text) represents support for or opposition to a proposed piece of legislation.
-% https://aclanthology.org/W06-1639.pdf
-
-
-% https://aclanthology.org/W15-5614/ - An Annotated Corpus for Sentiment Analysis in Political News
-% https://www.sciencedirect.com/science/article/pii/S1877050921018755
-
-
-% 2017
-% We propose a deep learning architecture to capture argumentative relations of attack and support from one piece of text to another, of the kind that naturally occur in a debate.
-% Proceedings of the 2017 Conference on Empirical Methods in Natural Language Processing, pages 1374–1379Copenhagen, Denmark, September 7–11, 2017. c©2017 Association for Computational LinguisticsIdentifying attack and support argumentative relations using deep learning
-% https://aclanthology.org/D17-1144.pdf
-
+No contexto de análise de notícias de política em Português, e tanto quanto é do meu conhecimento, julgo este ser um dos primeiros trabalhos a propor um método para extrair de forma automática relações de apoio e oposição entre personalidades políticas de forma a poder construir um grafo semântico, seguindo a estrutura de relações proposta por~\cite{park-etal-2021-blames}: dada uma frase $s$ referindo duas entidades $p$ e $q$, detectar qual a relação de sentimentos entre $p$ e $q$ de entre cinco possíveis: neutra, $p$ tem uma opinião positiva ou negativa em relação a $q$, ou $q$ tem uma opinião positiva ou negativa em relação a $p$.
 
 \begin{table*}[!h]
   \centering
@@ -229,7 +215,7 @@ Este processo resultou num conjunto de dados contendo 3324 títulos anotados e 6
 
 % jq -r '"\(.ent1_id) \(.ent2_id)"' < politiquices_data_v3.0.jsonl | tr ' ' '\n' | sort | uniq -c | sort -gr
 
-Das 6648 menções a nomes de personalidades políticas apenas 708 são distintas, significando que há personalidades referidas com bastante frequência. Das 708 personalidades distintas, 517 têm um identificador na Wikidata sendo 191 não estão associadas a nenhum um identificador, por não estarem presentes na Wikidata.
+Das 6648 menções a nomes de personalidades políticas apenas 708 são distintas, significando que há personalidades referidas com bastante frequência. Das 708 personalidades distintas, 517 têm um identificador na Wikidata sendo 191 não estão associadas a nenhum um identificador, por não estarem presentes na Wikidata. Este conjunto de dados encontra-se disponibilizado online~\footnote{\url{https://github.com/politiquices/data-releases}}.
 
 \section{Processo de Extracção de Relações}
 \label{sec:classifiers}
@@ -312,7 +298,7 @@ def article_text(expanded, candidates):
     new_candidates = get_candidates(expanded)
     if len(new_candidates) == 1:
       if jaro(expanded, new_candidates[0])>=0.8:
-	    return candidates[0]
+        return candidates[0]
  
     filtered = exact(expanded, new_candidates)
     if len(filtered) == 1:
@@ -366,7 +352,7 @@ Na Tabela~\ref{tab:ent_linking_results} são também reportadas duas avaliaçõe
 \end{table}
 
 
-Por exemplo, nos dados anotados, todas as personalidades referidas pelo nome \textit{Cavaco} correspondem à personalidade \textit{Cavaco Silva}, usando este conhecimento, no processo de desambiguação todas as referências à \textit{Cavaco} são mapeadas para \textit{Cavaco Silva}, da mesma forma de todas as menções a \textit{Marques Mendes} correspondem à personalidade \textit{Luís Marques Mendes}. Usando estes mapeamentos, como mostra segunda coluna da Tabela~\ref{tab:ent_linking_results} conseguimos aumentar a exactidão, dado que reduzimos o número de entidades para as quais não conseguimos encontrar um mapeamento.
+Por exemplo, nos dados anotados, todas as personalidades referidas pelo nome \textit{Cavaco} correspondem à personalidade \textit{Cavaco Silva}, usando este conhecimento, no processo de desambiguação todas as referências à \textit{Cavaco} são mapeadas para \textit{Cavaco Silva}. Da mesma forma, de todas as menções a \textit{Marques Mendes} correspondem à personalidade \textit{Luís Marques Mendes}. Usando estes mapeamentos, como mostra segunda coluna da Tabela~\ref{tab:ent_linking_results} conseguimos aumentar a exactidão, dado que reduzimos o número de entidades para as quais não conseguimos encontrar um mapeamento.
 
 \subsection{Classificador de Tipo de Relação}
 \label{subsec:rel_classifier}
@@ -413,7 +399,7 @@ O modelo DistilBERT foi treinado tendo como base um modelo pré-treinado para po
 		\hline
 		Macro-Média      &  0.69  &  0.68  &  0.68   \\
     \end{tabular}
-    \caption{LSTM bi-direccional\label{tbl:bilstm}}
+    \caption{LSTM bidireccional\label{tbl:bilstm}}
     \vspace{5mm}     
     \end{subtable}
 \quad%   
@@ -434,7 +420,6 @@ O modelo DistilBERT foi treinado tendo como base um modelo pré-treinado para po
   \label{tab:results_relacao}
 \end{table}
 
-
 A Tabela~\ref{tab:results_relacao} descreve os resultados para os vários classificadores. Os resultados mostram que não há diferenças muito acentuadas em termos de performance entre os 3 classificadores, embora a abordagem usando o DistilBERT tenha alcançado os melhores resultados. Ao analisar os resultados notamos que um desafio importante é classificar correctamente títulos que contêm expressões idiomáticas, por exemplo:
 
 \begin{itemize}
@@ -443,6 +428,8 @@ A Tabela~\ref{tab:results_relacao} descreve os resultados para os vários classi
 \item{\textit{Louçã diz que “António Borges é o grilo falante” de Passo Coelho}}
 \item{\textit{Louçã acusa Passos de ser o “cangalheiro da melhor maternidade” do país}}
 \end{itemize}
+
+Outras relações são difíceis de classificar porque requerem mais contexto do que aquele presente apenas no título. No conjunto de dados que fazemos público, todos os títulos contêm um URL para o texto da notícia.
 
 \begin{table*}
   \centering
@@ -458,38 +445,33 @@ A Tabela~\ref{tab:results_relacao} descreve os resultados para os vários classi
 
 	  \hline
   \end{tabular}
-  \caption{Exemplos de títulos e quais as regras de padrões usadas para detectar a direcçao da relação.}
+  \caption{Exemplos de títulos e quais as regras de padrões usadas para detectar a direcção da relação.}
   \label{tab:examples_patterns_direction}
 \end{table*}
 
 \subsection{Classificador de Direção da Relação}
 \label{subsec:rel_direction}
 
-Como descrito na secção anterior, a da relação presente nos títulos é decomposta em duas tarefas: classificar o tipo de relação, e a direcção da relação. Esta secção descreve o segundo classificador. Este classificador tem 2 classes possíveis, Ent\textsubscript{1} $\rightarrow$ Ent\textsubscript{2} ou Ent\textsubscript{2}$\leftarrow$Ent\textsubscript{1}.
+Esta secção descreve o classificador da direcção com 2 classes possíveis, Ent\textsubscript{1} $\rightarrow$ Ent\textsubscript{2} ou Ent\textsubscript{2}$\leftarrow$Ent\textsubscript{1}. 
 
-O conjunto de dados tem um viés para com a classe Ent\textsubscript{1} $\rightarrow$ Ent\textsubscript{2}, como mostra a Tabela~\ref{tab:rel_dataset} representando 91,5\% dos dados. Assim, optamos por desenvolver uma abordagem baseada em regras para detectar apenas a classe Ent\textsubscript{2}$\leftarrow$Ent\textsubscript{1}, e sempre que nenhuma das regras se verifica o classificador atribui a classe Ent\textsubscript{1} $\rightarrow$ Ent\textsubscript{2} por omissão.
+Como mostra a Tabela~\ref{tab:rel_dataset}, o conjunto de dados tem um viés para com a classe Ent\textsubscript{1} $\rightarrow$ Ent\textsubscript{2} representando 91,5\% dos dados. Assim, optamos por desenvolver uma abordagem baseada em regras para detectar apenas a classe Ent\textsubscript{2}$\leftarrow$Ent\textsubscript{1}, e sempre que nenhuma das regras se verifica o classificador atribui a classe Ent\textsubscript{1} $\rightarrow$ Ent\textsubscript{2}.
 
-As regras são baseado em padrões construídos com informação morfológica e sintáctica~\citep{nivre-etal-2020-universal} extraída do título com o spaCy e usando o mesmo modelo usado para reconhecimento de nomes de personalidades, ~\texttt{pt\_core\_news\_lg-3.0.0}. Extraímos a informação morfo-sintáctica de todas as palavras, incluindo para os verbos informação sobre a conjugação: a pessoa e o número.
+Definimos três regras baseadas em padrões construídos com informação morfológica e sintáctica~\citep{nivre-etal-2020-universal} extraída do título com o spaCy e usando o mesmo modelo usado para reconhecimento de nomes de personalidades, ~\texttt{pt\_core\_news\_lg-3.0.0}. Extraímos a informação morfo-sintáctica de todas as palavras, incluindo para os verbos informação sobre a conjugação: a pessoa e o número.
 
 \begin{itemize}
 
-\item \textbf{VOZ\_PASSIVA}: identificamos a presença da voz passiva usando duas regras: verificando se a informação morfológica associado ao verbo principal do título indica a presença da voz passiva, e se for o caso verificamos se a entidade Ent\textsubscript{1} é a cabeça do verbo ligada por uma dependência do tipo \textbf{acl}. A segunda regra verifica se a cabeça da entidade Ent\textsubscript{1} é um verbo ligado por uma dependência do tipo \textbf{nsubj:pass} e se o mesmo verbo é também a cabeça da entidade Ent\textsubscript{2} ligado por uma dependência do tipo \textbf{obl:agent}.
+\item \textbf{VOZ\_PASSIVA}: procuramos por padrões \texttt{<VERB><ADP>}, um verbo seguido de uma proposição, identificamos a presença da voz passiva verificando se a informação morfológica associada ao verbo principal indica a presença da voz passiva, e se for o caso verificamos se a voz passiva envolve as personalidades mencionadas no título. Verificamos se a entidade Ent\textsubscript{1} tem uma dependência para com o verbo do tipo \textbf{acl}, se o verbo tem uma dependência para com a Ent\textsubscript{1} do tipo \textbf{nsubj:pass} ou se o verbo tem uma dependência para com a Ent\textsubscript{2} do tipo \textbf{obl:agent}. 
 
-\textbf{TODO: exemplo}
+\item \textbf{VERBO\_ENT2}: detecta o padrão morfológico \texttt{<PUNCT><VERB>Ent\textsubscript{2}<EOS>}, um sinal de pontuação seguido de um verbo, e terminando com a Ent\textsubscript{2}, restringido o verbo a ser conjugado na 3ª pessoa do singular do presente do indicativo, e onde \texttt{<EOS>} representa o final do título, significando que Ent\textsubscript{2} é a última palavra no texto do título.
 
-% COMMENT: The head of the acl relation is the noun that is modified, and the dependent is the head of the clause that modifies the noun.%
-
-\item \textbf{VERBO\_ENT2}: é baseada num padrão morfológico, \texttt{<PUNCT><VERB>Ent\textsubscript{2}<EOS>}, um sinal de pontuação seguido de um verbo, e terminando com a Ent\textsubscript{2}, sendo que o verbo é restringido a ser conjugado na 3ª pessoa do singular do presente do indicativo, e onde \texttt{<EOS>} representa o final do título, significando que Ent\textsubscript{2} é a última palavra no texto do título.
-
-\item \textbf{NOUN\_ENT2}: é também baseada num padrão morfológico, um substantivo podendo ser precedido ou seguido de um ou mais adjectivos, e terminando com a Ent\textsubscript{2}, \texttt{<ADJ>?<NOUN><ADJ>?<ADP>Ent\textsubscript{2}<EOS>}.
-
+\item \textbf{NOUN\_ENT2}: verifica se o padrão \texttt{<ADJ>?<NOUN><ADJ>?<ADP>Ent\textsubscript{2}<EOS>} está presente no título, i.e.: um substantivo podendo ser precedido ou sucedido de um ou mais adjectivos terminando com a Ent\textsubscript{2}, sendo que o substantivo é restrito a uma lista de substantivos pré-definida.
 \end{itemize}
 
-A Tabela~\ref{tab:examples_patterns_direction} mostra alguns exemplos de títulos de notícias e das regras que foram aplicadas para detectar a direcção {Ent\textsubscript{1} $\leftarrow$ Ent\textsubscript{2}.
+A Tabela~\ref{tab:examples_patterns_direction} mostra alguns exemplos de títulos de notícias e das regras que foram aplicadas para detectar a direcção {Ent\textsubscript{1} $\leftarrow$ Ent\textsubscript{2}. As regras definidas são aplicadas de forma sequencial, pela mesma ordem que são aqui descritas e se nenhum dos padrões definidos é detectado no título, o classificador classifica a direcção da relação no título como {Ent\textsubscript{1} $\rightarrow$ Ent\textsubscript{2}}.
 
-Os padrões são aplicados de forma sequencial, pela mesma ordem que são descritos, e se nenhum deles corresponde ao título, classificamos o título como {Ent\textsubscript{1} $\rightarrow$ Ent\textsubscript{2}}. A Tabela~\ref{tab:direction_clf_results} contem os resultados deste classificador baseado em padrões para o conjunto de dados anotados.
+A Tabela~\ref{tab:direction_clf_results} contem os resultados deste classificador baseado em padrões para o conjunto de dados anotados.
 
-\begin{table}
+\begin{table}[!h]
     \begin{center}
     \begin{tabular}{l cccr}
         {\bf Direction} & {\bf P} & {\bf A} & {\bf F\textsubscript{1}} & {\bf \#Títulos} \\
@@ -504,172 +486,39 @@ Os padrões são aplicados de forma sequencial, pela mesma ordem que são descri
 	\end{center}
 \end{table}
 
+Os resultados mostram que o método proposto classifica correctamente grande parte da direcção das relações {Ent\textsubscript{1} $\leftarrow$ Ent\textsubscript{2}, a única classe para as quais forem desenvolvidas regras.
+
 \section{Grafo Semântico}
 \label{sec:pipeline}
 
-%\begin{figure*}[!ht]
-%  \includegraphics[width=\textwidth,height=4cm]{politiquices_pipeline.png}
-%  \caption{Politiquices pipeline for generating RDF triples.}
-%  \label{fig:pipeline}
-%\end{figure*}
+Os componentes descritos na secção anterior formam o processo de extracção de triplos RDF a partir dos títulos de notícias recolhidos. Os triplos gerados são depois indexados numa base de dados de formando um grafo semântico que pode ser interrogado recorrendo à linguagem SPARQL.
 
-Os componentes descritos na secção anterior formam o processo de extracção de triplos RDF a partir dos títulos de notícias recolhidos do arquivo da web portuguesa, formando assim um grafo que pode ser interrogado recorrendo à linguagem SPARQL.
+O processo de extracção começa por fazer o reconhecimento de personalidades no título na notícia e a sua ligação com o identificador de cada personalidade na Wikidata. O processo de extracção apenas continua se ambas as personalidades reconhecidas foram ligadas com um identificador na Wikidata, caso contrário o título é descartado.  Após ambas as personalidades estarem ligadas com a Wikidata o processo de extracção detecta o tipo de relação presente no título, se a relação entre as personalidades no título da notícia não for classificada como \textbf{outra} o classificador da direcção da relação é também aplicado ao título. 
 
-O processo de extracção começa por fazer o reconhecimento de personalidades no título na notícia e a sua ligação com o identificador de cada personalidade na Wikidata. Para continuar é necessário que as personalidades reconhecidas sejam ligadas com a Wikidata, e se assim for detecta o tipo de relação presente no título.  Se a relação entre as personalidades no título da notícia não for classificada como \textbf{outra} o classificador da direcção da relação é também aplicado ao título. 
+Para todos os títulos não descartados em nenhuma etapa do processo, o resultado final é um triplo RDF, ligando personalidades representadas na Wikidata através de uma relação de oposição ou apoio suportada por uma notícia. Os triplos RDF gerados são então indexados num motor SPARQL~\citep{jena2015free} juntamente com um sub-grafo da Wikidata descrito na Secção~\ref{sec_kb}.
 
-Para todos os títulos não descartados em nenhuma etapa do processo, o resultado final é um triplo RDF, ligando personalidades representadas na Wikidata através de uma relação de oposição ou apoio suportada por uma notícia.
-
-% descrever
-
-\begin{comment}
-
-% Personalidades
-%
-% <wiki_URI, SKOS.altLabel, name>
-% wd:Q100269161 ns2:altLabel "Henrique Constantino"@pt ;
-%    wdt:P31 wd:Q5 .
-
-% Notícias
-%  <url, DC.title, title>
-%  <url, DC.data, date)
-
-% Relações
-%
-% _rel = BNode()
-% g.add((_rel, ns1.type, Literal(rel.rel_type)))
-% g.add((_rel, ns1.score, Literal(rel.rel_score, datatype=XSD.float)))
-% g.add((_rel, ns1.url, URIRef(rel.url)))
-% g.add((_rel, ns1.ent1, URIRef(f"http://www.wikidata.org/entity/{rel.ent1}")))
-% g.add((_rel, ns1.ent2, URIRef(f"http://www.wikidata.org/entity/{rel.ent2}")))
-% g.add((_rel, ns1.ent1_str, Literal(rel.ent1_str)))
-% g.add((_rel, ns1.ent2_str, Literal(rel.ent2_str)))
-
-
-
-\end{comment}
-
-Os triplos RDF gerados são então indexados num motor SPARQL~\citep{jena2015free} juntamente com um sub-grafo da Wikidata descrito na Secção~\ref{sec_kb}.
-
-% ToDo: descrever o grafo final em nós e relações
-
-\begin{table}[!h]
-    \begin{center}
-    \begin{tabular}{l r}
-        \hline
-        Personalidades 	 	& 589 \\
-		Partidos Políticos	&  86 \\
-		Notícias			& \\
-			- arquivo.pt	& \\
-			- publico.pt    & \\
-			- CHAVE			& \\
-		\hline
-    \end{tabular}
-	\caption{Caracterização do grafo.}
-	\label{tab:grafo}
-	\end{center}
-\end{table}
-
-% dar exemplos dos queries que se possam fazer, ver os exemplos
-% ToDo: links para o site com a demo
-% availabe to download under the Turtle format https://www.w3.org/TR/turtle/
-
-\begin{comment}
-%  ner_linked.jsonl
-%  titles_processed.jsonl
-%  titles_processed_more_entities.jsonl
-%  titles_processed_no_wiki_id.jsonl
-
-% ToDo: qnts nao têm named-entities?
-% 	ner_ignored.jsonl
-% 	titles_processed_no_entities.jsonl
-
-% ToDo: entities but not found on Wikidata
-% 	 no_wiki_id.jsonl
-\end{comment}
+O grafo tem um total de 680 personalidades políticas, 107 partidos políticos 10.361 notícias. Está disponível online no formato \textit{Terse RDF Triple Language}~\footnote{\url{https://github.com/politiquices/data-releases}} e poder ser também explorado através de um interface web~\footnote{\url{https://www.politiquices.pt}}
 
 \section{Trabalho Futuro}
 \label{sec:future_work}
 
-Neste artigo foi proposta uma abordagem de utilização de técnicas de extracção de informação de forma a criar bases de conhecimento, em larga escala, a partir de repositórios de documentos de texto. 
+O grafo semântico gerado por este trabalho dá a oportunidade de realizar diversos estudos, por exemplo: encontrar comunidades~\cite{} de apoio e oposição em função do tempo e verificar quais mudanças entre dentro dessas comunidades ou por exemplo estudar os triângulos políticos: se personalidades políticas X e Y sempre acusam ou defendem uma terceira personalidade Z, qual será a relação típica entre X e Y?
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+% Texto
+% Fazer uso da notícia para ajudar a detectar a relação, normalmente o primeiro parágrafo da notícia tem já informação suficiente.
+% A grande maioria das notícias tem como origem o arquivo da web portuguesa, através da sua \textit{API} que retorna o título e o HTML original da página. Limpar os dados, de forma a descartar todo o HTML e ter o corpo da notícia não é uma tarefa simples, especialmente considerando o variedade de domínios e o período temporal. Por esta razão optamos por focar a extracção de relações no título das notícias.
+% As relações extraídas podem ser enriquecidas, categorizando-as num ou mais tópicos com base numa análise detalhada do texto da notícia.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
-
-
-% Review the dataset
-
-% - mostrar mais relações:
-%    - apoia/defende c/ as duas direções
-%    - acusa/opoem-se c/ as duas direções
-%        e.g: "Sócrates e Alegre trocam acusações sobre co-incineração"
-%			  "Pinto da Costa rebate críticas de Pacheco Pereira"
-
+% Relações
+Alguns títulos contêm uma relação mutua entra as duas personalidades, por exemplo os seguintes títulos: \textit{"Sócrates e Alegre trocam acusações sobre co-incineração"}} ou \textit{"Pinto da Costa rebate críticas de Pacheco Pereira"}}, poderiam ser ambos classificados com a relação Ent\textsubscript{2}$\leftrightarrow$Ent\textsubscript{1}, indicando que ambas as personalidades se acusação. 
 % analisar tb títulos com mais do que 2 entidades
 
+% Usar aprendizagem supervisionado para detectar a direcção.
 % limitações das datas, são as datas de crawl e não de publicação da notícia, como combater isto?
-
-% algumas relações/sentimento são dificeis de extraiar:
-%	- requerem contexto
-%	- usam expressoes idiomáticas ou irónicas
-
-
-% difficult to extract the exact context, syntactic parsing
-% Socialistas aprovam voto de protesto contra elogios de Jaime Gama a Alberto João Jardim
-% Nobre Guedes apela a levantamento popular para impedir entrada de Sócrates em Coimbra
-% Francisco Lopes aponta convergência entre Cavaco e Alegre no rumo que levou ao 'afundamento' do país
-% oposses both persons
-% não anotei felicita qnd ganha eleicoes, nem 
-
-\begin{comment}
-	% ent1 asks for action from ent2
-	% Jorge Coelho apela a Guterres que apresente candidatura à Presidência da República
-	% Narana Coissoró espera que Cavaco "se lembre" do apoio dado pelo CDS
-	% Jaime Gama espera de Cavaco Silva "disponibilidade e cooperação"
-	% Paulo Portas apela a Cavaco Silva para que vete a lei de execução de penas
-	% Paulo Rangel propõe a Sócrates activação do fundo de solidariedade da UE
-	% Jorge Lacão sugere que Ferreira Leite vá depor à comissão de inquérito
-	% Fernando Nobre não pediu voto a Mário Soares, mas ficaria “honrado com o seu apoio”
-	% Obama diz a Mubarak que a transição política “tem que começar agora”
-	% Mário Soares pede intervenção de Cavaco para “impedir uma catástrofe”
-	% Narciso Miranda pede a Sócrates que renuncie à recandidatura a primeiro-ministro
-	% Santos Silva admite que Cavaco deve mediar negociações
-	% Passos pede a Sócrates “todas as análises” realizadas pela “troika”
-	% César apela Cavaco para impedir medidas alegadamente inconstitucionais
-	% Zorrinho espera que Cavaco continue a apelar à “sensibilidade do Governo”
-	% Seguro espera que Merkel traga investimento
-	% Jorge Miranda aconselha Cavaco a pedir fiscalização do Orçamento
-	% António Arnaut entende que Seguro deve convocar congresso
-	% Passos assume que pediu a Cavaco para enviar medidas para o TC
-	% Cavaco pediu a Ban Ki-Moon reunião internacional para pressionar Guiné-Bissau
-	% Paulo Morais apela a Eduardo dos Santos para libertar activistas
-	% Catarina Martins pede a Costa que reconsidere escolha do novo chefe das secretas
-\end{comment}
-
-% Julgo que os resultados do Politiquices representam um complemento importante nos recursos já existentes para o processamento de linguagem natural em Português, mas também um ponto de partida no desafio de fazer análise de sentimento entre personalidades políticas expressas em notícias.
-
-% O grafo de relações permite a cientistas de áreas como: sociologia, ciência política e computação realizar diversos estudos, por exemplo:
-
-% Encontrar comunidades de apoio e oposição em função do tempo e verificar se há mudanças entre alianças e oposições
-
-% Enriquecer as relações, categorizando-as num ou mais tópicos com base numa análise detalhada do texto da notícia
-
-% Estudar os triângulos políticos: se as personalidades políticas X e Y sempre acusam ou defendem uma terceira personalidade Z, qual será a relação típica entre X e Y ?
-
-% Os dados anotados permitem que novos algoritmos sejam treinados para detectar relações e ligar as personalidades com a Wikidata, e servem de incentivo ao desenvolvimento de melhores algoritmos de processamento de linguagem natural no contexto de notícias de âmbito político em Português.
-
-% O grafo de relações permite a cientistas de áreas como: sociologia, ciência política e computação realizar diversos estudos, por exemplo:
-	% Encontrar comunidades de apoio e oposição em função do tempo e verificar se há  mudanças entre alianças e oposições
-	% Enriquecer as relações, categorizando-as num ou mais tópicos com base numa análise detalhada do texto da notícia
-	% Estudar os triângulos políticos: se as personalidades políticas X e Y sempre acusam ou defendem uma terceira personalidade Z, qual será a relação típica entre X e Y ?
-
-% A grande maioria das notícias tem como origem o arquivo da web portuguesa, através da sua \textit{API} que retorna o título e o HTML original da página. Limpar os dados, de forma a descartar todo o HTML e ter o corpo da notícia não é uma tarefa simples, especialmente considerando o variedade de domínios e o período temporal. Por esta razão optamos por focar a extracção de relações no título das notícias.
 
 \section*{Agradecimentos}
 
-Gostaríamos de agradecer ao Nuno Feliciano por todos os comentários dados na construção e elaboração deste trabalho.
-
-% Os agradecimentos devem ser colocados sempre numa secção final, sem número, tal como neste exemplo. Sempre que o autor assim o entender, deverá agradecer aos revisores.
+Gostaríamos de agradecer ao Nuno Feliciano por todos os comentários dados na construção e elaboração deste trabalho. % Sempre que o autor assim o entender, deverá agradecer aos revisores.
 
 \bibliography{references.bib}
 
