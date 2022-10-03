@@ -179,7 +179,7 @@ No contexto de análise de notícias de política em Português, e tanto quanto 
 
 \section{Base de Conhecimento}
 \label{sec_kb}
-Dado que as personalidades envolvidas nas relações a extrair são personalidades políticas relevantes, começámos por construir uma Base de Conhecimento usando a Wikidata~\citep{MKGGB2018}. Fazendo interrogações SPARQL~\cite{2013sparql} ao seu \textit{endpoint} público~\footnote{\url{https://query.wikidata.org/sparql}} recolhemos o identificador de todas as:
+Dado que as personalidades envolvidas nas relações a extrair são personalidades políticas relevantes, começámos por construir uma Base de Conhecimento usando a Wikidata~\citep{MKGGB2018}. Fazendo interrogações SPARQL~\cite{2013sparql} ao seu \textit{endpoint} público\footnote{\url{https://query.wikidata.org/sparql}} recolhemos o identificador de todas as:
 
 \begin{itemize}  
 \item pessoas que são ou foram afiliadas a algum partido político português
@@ -248,8 +248,6 @@ O processo de extração de triplos em formato Resource Description Framework (R
 \item classificação da direcção da relação
 \end{itemize}
 
-Nesta secção descrevemos em detalhe cada um destes processos.
-
 \subsection{Reconhecimento de Entidades}
 \label{subsec:ner}
 
@@ -263,7 +261,7 @@ A Tabela~\ref{tab:results_ner} mostra a performance para as 3 abordagens sob o c
 
 % jq -r '"\(.ent1)|\(.ent2)"' < politiquices_data_v3.0.jsonl | tr '|' '\n' | wc -l
 
-\begin{table}[!h]
+\begin{table}
     \begin{center}
     \begin{tabular}{l ccc}
 		{\bf Abordagem}  & {\bf P} & {\bf A} & {\bf F\textsubscript{1}} \\
@@ -282,9 +280,11 @@ A Tabela~\ref{tab:results_ner} mostra a performance para as 3 abordagens sob o c
 
 O procedimento para associar as personalidades com identificadores na Wikidata tenta numa primeira fase usar apenas o título da notícia, se este processo falhar, tenta então usar possíveis referências às personalidades no texto da notícia. A similaridades entre candidatos da BC e as personalidades referidos no texto são calculadas com a similaridade Jaro~\citep{jaro1989}.
 
-Na primeira fase o algoritmo começa por gerar uma lista de candidatos, para uma determinada personalidade usando a BC. Se a lista contem apenas um candidato e a similaridade para com a personalidade referida no título é de pelo menos 0,8 esse candidato é seleccionado. Se houver mais do que um candidato o algoritmo filtra apenas aqueles com uma similaridade de 1,0 e se houver apenas um esse é o candidato seleccionado. Em qualquer outro caso nenhum candidato é retornado. O Algoritmo~\ref{lst:alg1} descreve este procedimento usando apenas o título da notícia.
+Na primeira fase o algoritmo começa por gerar uma lista de candidatos, para uma determinada personalidade usando a BC. Se a lista contem apenas um candidato e a similaridade para com a personalidade referida no título é de pelo menos 0,8 esse candidato é seleccionado. Se houver mais do que um candidato o algoritmo filtra apenas aqueles com uma similaridade de 1,0 e se houver apenas um esse é o candidato seleccionado. Em qualquer outro caso nenhum candidato é retornado. 
 
-\begin{lstlisting}[language=python,columns=fullflexible,frame=single,label={lst:alg1},title={Algoritmo 1. Ligação com a Wikidata usando apenas o título.},captionpos=b]
+O Algoritmo~\ref{lst:alg1} descreve este procedimento usando apenas o título da notícia.
+
+\begin{lstlisting}[language=python,columns=fullflexible,frame=single,label={lst:alg1},title={Algoritmo 6.1. Ligação com a Wikidata usando apenas o título.},captionpos=b]
 def title_only(ent, candidates):
     if len(candidates) == 1:
       if jaro(per,candidates[0]) >= 0.8:
@@ -306,16 +306,16 @@ Se do processo de expansão resultam várias entidades expandidas, filtramos can
 
 O Algoritmo~\ref{lst:alg2} descreve este procedimento usando o texto da notícia.
 
-\begin{lstlisting}[language=python,columns=fullflexible,frame=single,label={lst:alg2},title={Algoritmo 2. Ligação com a Wikidata usando o texto da notícia para expandir as entidades reconhecidas no título.},captionpos=b]]
+\begin{lstlisting}[language=python,columns=fullflexible,frame=single,label={lst:alg2},title={Algoritmo 6.2. Ligação com a Wikidata usando o texto da notícia para expandir as entidades reconhecidas no título.},captionpos=b]]
 def article_text(expanded, candidates):
   if len(expanded) == 1:
     filtered = exact(expanded[0], candidates)
 	if len(filtered) == 1:
 	  return filtered[0]
 	  
-    new_candidates = get_candidates(expanded)
+    candidates = get_candidates(expanded)
     if len(new_candidates) == 1:
-      if jaro(expanded, new_candidates[0])>=0.8:
+      if jaro(expanded, candidates[0])>=0.8:
         return candidates[0]
  
     filtered = exact(expanded, new_candidates)
@@ -351,9 +351,9 @@ def entity_linking(per):
 
 Os resultados desta abordagem sobre o conjunto de dados anotados e descritos na Secção~\ref{sec:rel_data_annot} são descritos na Tabela~\ref{tab:ent_linking_results}. A classificação \textit{incorrecta} corresponde a personalidades que não foram associadas ao identificador correcto na Wikidata, \textit{não desambiguada} para as que o algoritmo não conseguiu chegar a um identificador único ou não encontrou nenhum identificador na BC.
 
-Na Tabela~\ref{tab:ent_linking_results} são também reportadas duas avaliações, a primeira coluna descreve os resultados para o algoritmo, tal como descrito acima. A coluna a priori é o mesmo algoritmo mas considerando as contagens a priori das referências às entidades mencionadas para com a personalidade que representam na Wikidata. As contagens são usadas para desambiguação. 
+Na Tabela~\ref{tab:ent_linking_results} são reportadas duas avaliações, a primeira coluna descreve os resultados para o algoritmo base. A coluna \textit{a priori} considera as contagens de referências às entidades mencionadas para com a personalidade que representam na Wikidata. Por exemplo, nos dados anotados, todas as personalidades referidas pelo nome \textit{Cavaco} correspondem à personalidade \textit{Cavaco Silva}, com base nisto o algoritmo mapeia todas as referências a \textit{Cavaco} para \textit{Cavaco Silva}. Da mesma forma, de todas as menções a \textit{Marques Mendes} correspondem à personalidade \textit{Luís Marques Mendes}. Usando estes mapeamentos conseguimos aumentar a exactidão, reduzindo bastante o número de entidades para as quais não conseguimos encontrar um identificador.
 
-\begin{table}[!h]
+\begin{table}
     \begin{center}
     \begin{tabular}{l rr}
         {\bf Classificação} &               & {\bf a priori} \\
@@ -369,23 +369,20 @@ Na Tabela~\ref{tab:ent_linking_results} são também reportadas duas avaliaçõe
 	\end{center}
 \end{table}
 
-
-Por exemplo, nos dados anotados, todas as personalidades referidas pelo nome \textit{Cavaco} correspondem à personalidade \textit{Cavaco Silva}, usando este conhecimento, no processo de desambiguação todas as referências à \textit{Cavaco} são mapeadas para \textit{Cavaco Silva}. Da mesma forma, de todas as menções a \textit{Marques Mendes} correspondem à personalidade \textit{Luís Marques Mendes}. Usando estes mapeamentos, como mostra segunda coluna da Tabela~\ref{tab:ent_linking_results} conseguimos aumentar a exactidão, dado que reduzimos o número de entidades para as quais não conseguimos encontrar um mapeamento.
-
 \subsection{Classificador de Tipo de Relação}
 \label{subsec:rel_classifier}
 
-Decidimos decompor a tarefa de classificação do tipo de relação, descritas na Tabela~\ref{tab:rel_dataset}, em dois classificadores diferentes: um classificador para o tipo de relação e outro para a direcção da relação, por oposição a treinar um único classificador que teria que distinguir de entre 5 classes. Esta secção descreve o classificador do tipo de relação presente num título, tendo 3 classes possíveis: \textbf{opõe-se}, \textbf{apoia} e \textbf{outra}. Todas as experiências descritas foram feitas com uma avaliação cruzada de 4 partições, os resultados reportados são dos resultados sobre todos os conjuntos de teste.
+Decidimos decompor a tarefa de classificação do tipo de relação, descritas na Tabela~\ref{tab:rel_dataset}, em dois classificadores: um para o tipo de relação e outro para a direcção da relação, por oposição a treinar um único classificador que teria que distinguir de entre 5 classes. Esta secção descreve o classificador do tipo de relação presente num título, tendo 3 classes possíveis: \textbf{opõe-se}, \textbf{apoia} e \textbf{outra}. Todas as experiências descritas foram feitas com uma avaliação cruzada de 4 partições, os resultados reportados são dos resultados sobre todos os conjuntos de teste.
 
-Experimentamos e avaliámos diferentes abordagens para classificação supervisionada das relações presentes nos títulos, nomeadamente: um classificador SVM~\citep{cortes1995support} com um \textit{kerne}l linear, uma rede neuronal recorrente do tipo LSTM~\citep{10.1162/neco.1997.9.8.1735}, e uma rede neuronal do tipo \textit{transformer}, o DistilBERT~\citep{9463516}.
+Avaliámos diferentes abordagens para classificação supervisionada das relações presentes nos títulos, nomeadamente: um classificador SVM~\citep{cortes1995support} com um \textit{kerne}l linear, uma rede neuronal recorrente do tipo LSTM~\citep{10.1162/neco.1997.9.8.1735}, e uma rede neuronal do tipo \textit{transformer}, o DistilBERT~\citep{9463516}.
 
 Para o classificador SVM utilizámos como \textit{features} uma abordagem baseada em vectores TF-IDF~\citep{DBLP:journals/ipm/SaltonB88}, fazendo um pré-processamento do título, usando uma padrão, de modo a identificar o contexto relevante, i.e.: o contexto no título que contem informação para identificar a relação: \texttt{<Ent\textsubscript{1} X Ent\textsubscript{2} \textbf{contexto}>} onde \texttt{X} = \{\textit{“diz a”, “responde a”, “sugere a”, “diz que, “afirma que”, “espera que”, “defende que”, “considera que”, “sugere que”, “quer saber se”, “considera”, “manda”}\}. Sempre que não conseguimos extrair um contexto relevante usamos todas as palavras do título excepto o nome das personalidades.
 
-A rede neuronal recorrente LSTM foi usada numa arquitectura bidireccional, ou seja duas LSTMs, ambas com uma dimensão de 128, uma lendo o título da primeira para a última palavra e outra da última para a primeira palavra, sendo que os dois estados finais de cada LSTM são depois concatenados e passados para um \textit{layer} linear. Usamos \textit{embeddings} pré-treinados para Português baseados no método FastText (skip-gram) de dimensão 50, disponibilizados por~\cite{hartmann-etal-2017-portuguese}. A rede foi treinada durante 5 \textit{epochs} com um \textit{batch size} de tamanho 8.
+A rede neuronal recorrente LSTM foi usada numa arquitectura bidireccional, ou seja duas LSTMs, ambas com uma dimensão de 128, uma lendo o título da primeira para a última palavra e outra da última para a primeira palavra, sendo que os dois estados finais de cada LSTM são concatenados e passados a um \textit{layer} linear. Usamos \textit{embeddings} pré-treinados para Português baseados no método FastText (skip-gram) de dimensão 50~\citep{hartmann-etal-2017-portuguese}. A rede foi treinada por 5 \textit{epochs} com um \textit{batch size} de tamanho 8.
 %optimizer = optim.Adam(model.parameters())
 %criterion = nn.BCELoss()
 
-O modelo DistilBERT foi treinado tendo como base um modelo pré-treinado para português~\citep{abdaoui-etal-2020-load}, sendo que foi depois afinado no conjunto de dados anotado, i.e.: os pesos de todos os \textit{layers} pré-treinados foram actualizados tendo em conta a tarefa de classificação da relação. A rede foi treinada durante 5 \textit{epochs} com um \textit{batch size} de tamanho 8.
+O modelo DistilBERT foi treinado tendo como base um modelo pré-treinado para português~\citep{abdaoui-etal-2020-load}, sendo depois afinado no conjunto de dados anotado, i.e.: os pesos de todos os \textit{layers} pré-treinados foram actualizados tendo em conta a tarefa de classificação da relação. A rede foi treinada durante 5 \textit{epochs} com um \textit{batch size} de tamanho 8.
 %optimizer = optim.Adam(model.parameters())
 %tipo de loss function? nn.BCEWithLogitsLoss(pos_weight=self._class_weights)
 
@@ -402,7 +399,7 @@ O modelo DistilBERT foi treinado tendo como base um modelo pré-treinado para po
 		\hline
 		Macro-Média      &	0.69  &  0.69  &  0.69   \\
     \end{tabular}
-    \caption{SVM com um kernel linear\label{tbl:svmlinearaccuracy}}
+    \caption{SVM com um kernel linear.\label{tbl:svmlinearaccuracy}}
     \vspace{5mm}           
     \end{subtable}
 \quad%  
@@ -417,7 +414,7 @@ O modelo DistilBERT foi treinado tendo como base um modelo pré-treinado para po
 		\hline
 		Macro-Média      &  0.69  &  0.68  &  0.68   \\
     \end{tabular}
-    \caption{LSTM bidireccional\label{tbl:bilstm}}
+    \caption{LSTM bidireccional.\label{tbl:bilstm}}
     \vspace{5mm}     
     \end{subtable}
 \quad%   
@@ -432,7 +429,7 @@ O modelo DistilBERT foi treinado tendo como base um modelo pré-treinado para po
 		\hline
 		Macro-Média      &  0.73  &  0.72  &  0.72   \\
     \end{tabular}
-    \caption{DistilBERT \label{tbl:distilbert}}
+    \caption{DistilBERT pré-treinado em Português.\label{tbl:distilbert}}
     \end{subtable}
   \caption{(P)recisão, A(brangência) e F\textsubscript{1} para uma avaliação com 4-partições e validação cruzada com diferentes classificadores.}
   \label{tab:results_relacao}
@@ -442,12 +439,11 @@ A Tabela~\ref{tab:results_relacao} descreve os resultados para os vários classi
 
 \begin{itemize}
 \item{\textit{José Lello diz que Nogueira Leite quer “abifar uns tachos”}}
-\item{\textit{Jerónimo de Sousa: Passos Coelho “não dá a cara com a careta”}}
 \item{\textit{Louçã diz que “António Borges é o grilo falante” de Passo Coelho}}
 \item{\textit{Louçã acusa Passos de ser o “cangalheiro da melhor maternidade” do país}}
 \end{itemize}
 
-Outras relações são difíceis de classificar porque requerem mais contexto do que aquele presente apenas no título. No conjunto de dados que fazemos público, todos os títulos contêm um URL para o texto da notícia.
+Algumas relações são ambíguas e difíceis de classificar porque requerem mais contexto do que aquele presente apenas no título. No conjunto de dados que fazemos público, todos os títulos contêm um URL para o texto da notícia. No processo de geração do grafo final usamos o modelo DistilBERT.
 
 \begin{table*}
   \centering
@@ -470,11 +466,11 @@ Outras relações são difíceis de classificar porque requerem mais contexto do
 \subsection{Classificador de Direção da Relação}
 \label{subsec:rel_direction}
 
-Esta secção descreve o classificador da direcção com 2 classes possíveis, Ent\textsubscript{1} $\rightarrow$ Ent\textsubscript{2} ou Ent\textsubscript{2}$\leftarrow$Ent\textsubscript{1}. 
+O classificador da direcção tem 2 classes possíveis, Ent\textsubscript{1} $\rightarrow$ Ent\textsubscript{2} ou Ent\textsubscript{2}$\leftarrow$Ent\textsubscript{1}. 
 
 Como mostra a Tabela~\ref{tab:rel_dataset}, o conjunto de dados tem um viés para com a classe Ent\textsubscript{1} $\rightarrow$ Ent\textsubscript{2} representando 91,5\% dos dados. Assim, optamos por desenvolver uma abordagem baseada em regras para detectar apenas a classe Ent\textsubscript{2}$\leftarrow$Ent\textsubscript{1}, e sempre que nenhuma das regras se verifica o classificador atribui a classe Ent\textsubscript{1} $\rightarrow$ Ent\textsubscript{2}.
 
-Definimos três regras baseadas em padrões construídos com informação morfológica e sintáctica~\citep{nivre-etal-2020-universal} extraída do título com o spaCy e usando o mesmo modelo usado para reconhecimento de nomes de personalidades, ~\texttt{pt\_core\_news\_lg-3.0.0}. Extraímos a informação morfo-sintáctica de todas as palavras, incluindo para os verbos informação sobre a conjugação: a pessoa e o número.
+Definimos regras baseadas em padrões construídos com informação morfológica e sintáctica~\citep{nivre-etal-2020-universal} extraída do título com o spaCy, com mesmo modelo  para reconhecimento de personalidades. Extraímos a informação morfo-sintáctica de todas as palavras, incluindo para os verbos informação sobre a conjugação: a pessoa e o número.
 
 \begin{itemize}
 
@@ -520,21 +516,11 @@ O grafo tem um total de 680 personalidades políticas, 107 partidos políticos 1
 \section{Trabalho Futuro}
 \label{sec:future_work}
 
-{\bf TODO: rever}
+Como trabalho futuro gostaríamos de explorar o texto da notícia de forma a complementar o título para ajudar a detectar a relação, normalmente o primeiro parágrafo da notícia contem evidências suficientes para a classificar a relação. Também com base numa análise do texto da notícia as relações poderiam ser enriquecidas, categorizando-as num ou mais tópicos, que seriam mais uma dimensão da relação.
 
-O grafo semântico gerado por este trabalho dá a oportunidade de realizar diversos estudos, por exemplo: encontrar comunidades~\cite{} de apoio e oposição em função do tempo e verificar quais mudanças entre dentro dessas comunidades ou por exemplo estudar os triângulos políticos: se personalidades políticas X e Y sempre acusam ou defendem uma terceira personalidade Z, qual será a relação típica entre X e Y?
+Alguns títulos contêm uma relação mutua, por exemplo os títulos: \textit{"Sócrates e Alegre trocam acusações sobre co-incineração"}} ou \textit{"Pinto da Costa rebate críticas de Pacheco Pereira"}}, poderiam ser classificados com a relação de direcção Ent\textsubscript{2}$\leftrightarrow$Ent\textsubscript{1}, indicando que ambas as personalidades se acusam.
 
-% Texto
-% Fazer uso da notícia para ajudar a detectar a relação, normalmente o primeiro parágrafo da notícia tem já informação suficiente.
-% A grande maioria das notícias tem como origem o arquivo da web portuguesa, através da sua \textit{API} que retorna o título e o HTML original da página. Limpar os dados, de forma a descartar todo o HTML e ter o corpo da notícia não é uma tarefa simples, especialmente considerando o variedade de domínios e o período temporal. Por esta razão optamos por focar a extracção de relações no título das notícias.
-% As relações extraídas podem ser enriquecidas, categorizando-as num ou mais tópicos com base numa análise detalhada do texto da notícia.
-
-% Relações
-Alguns títulos contêm uma relação mutua entra as duas personalidades, por exemplo os seguintes títulos: \textit{"Sócrates e Alegre trocam acusações sobre co-incineração"}} ou \textit{"Pinto da Costa rebate críticas de Pacheco Pereira"}}, poderiam ser ambos classificados com a relação Ent\textsubscript{2}$\leftrightarrow$Ent\textsubscript{1}, indicando que ambas as personalidades se acusação. 
-% analisar tb títulos com mais do que 2 entidades
-
-% Usar aprendizagem supervisionado para detectar a direcção.
-% limitações das datas, são as datas de crawl e não de publicação da notícia, como combater isto?
+O grafo semântico abre oportunidade de realizar diversos estudos, por exemplo: encontrar comunidades de apoio e oposição em função do tempo e verificar quais mudanças entre dentro dessas comunidades ou por estudar triângulos políticos: se as personalidades políticas X e Y sempre acusam ou defendem uma terceira personalidade Z, qual será a relação típica entre X e Y?
 
 \section*{Agradecimentos}
 
