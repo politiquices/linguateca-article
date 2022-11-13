@@ -57,9 +57,17 @@
 \begin{resumo}
 Os títulos de notícias de política relatam com frequência interacções envolvendo personalidades políticas, sendo que muitas dessas interacções correspondem a relações de apoio ou oposição de uma personalidade para outra, por exemplo: \textit{``Marques Mendes critica estratégia de Rui Rio"} ou \textit{``Costa reafirma confiança em Centeno"}.
 
-Neste trabalho, analisámos centenas de milhares de títulos de notícias de artigos arquivados, identificando aqueles que expressam relações de apoio ou oposição entre duas personalidade políticas. Neste processo também associámos as personalidades políticas com o seu identificador na Wikidata. Este processo resultou num grafo semântico onde os nós são personalidades representadas na Wikidata ligadas através de vértices representando relações de oposição ou apoio suportadas por uma notícia. O grafo permite responder a diferentes tipos de interrogações envolvendo personalidades políticas e partidos, e.g.: \textit{Que personalidades do BE se opuseram a Jerónimo de Sousa?}, \textit{Que personalidades do BE se opuseram a personalidades do PCP?}, \textit{Quem do PS se opôs/apoiou a José Sócrates?}, \textit{Que personalidades do PS apoiaram personalidades do PSD?}
+Neste trabalho, analisámos centenas de milhares de títulos de notícias de artigos arquivados, identificando aqueles que expressam relações de apoio ou oposição entre duas personalidade políticas. 
 
-Neste artigo descrevemos o processo de extracção dos triplos que compõem o grafo semântico e tornamos acessível uma colecção de dados anotada manualmente. A colecção de dados anotada permitiu treinar classificadores de aprendizagem supervisionada para identificar as relações expressas nos títulos e ligar as personalidades referidas com a Wikidata. Tornamos também disponível publicamente o grafo resultante do processo de extracção, contendo um total de 680 personalidades políticas e referindo mais de 10 mil notícias cobrindo um período de cerca de 25 anos.
+% referir quais os desafios
+
+Neste processo também associámos as personalidades políticas com o seu identificador na Wikidata. Este processo resultou num grafo semântico onde os nós são personalidades representadas na Wikidata ligadas através de vértices representando relações de oposição ou apoio suportadas por uma notícia. O grafo permite responder a diferentes tipos de interrogações envolvendo personalidades políticas e partidos, e.g.: \textit{Que personalidades do BE se opuseram a Jerónimo de Sousa?}, \textit{Que personalidades do BE se opuseram a personalidades do PCP?}, \textit{Quem do PS se opôs/apoiou a José Sócrates?}, \textit{Que personalidades do PS apoiaram personalidades do PSD?}
+
+Neste artigo descrevemos o processo de extracção dos triplos que compõem o grafo semântico e tornamos acessível uma colecção de dados anotada manualmente. A colecção de dados anotada permitiu treinar classificadores de aprendizagem supervisionada para identificar as relações expressas nos títulos e ligar as personalidades referidas com a Wikidata. 
+
+% Os resultados da avaliação mostram que o seu desempenho supera as abordagens de classificação mais avançadas, tais como um modelo de classificação RoBERT aperfeiçoado. 
+
+Tornamos também disponível publicamente o grafo resultante do processo de extracção, contendo um total de 680 personalidades políticas e referindo mais de 10 mil notícias cobrindo um período de cerca de 25 anos.
 \end{resumo}
 
 %% Add keywords in the article main language, in lowercase
@@ -120,40 +128,66 @@ As principais contribuições deste trabalho são:
 
 Este artigo está organizado da seguinte forma: na Secção~\ref{sec_related_work} referimos trabalho relacionado, na Secção~\ref{sec_kb} descrevemos a Base de Conhecimento usada no suporte de ligação das personalidades políticas à Wikidata. A Secção~\ref{sec:data_sources} refere e descreve as fontes de notícias utilizadas. Na Secção~\ref{sec:rel_data_annot} detalhamos o conjunto de dados anotados e na Secção~\ref{sec:classifiers} os classificadores de aprendizagem supervisionada desenvolvidos. Na Secção~\ref{sec:pipeline} descrevemos o processo de extracção de triplos RDF e a construção do gráfico semântico. Finalmente, na Secção~\ref{sec:future_work} apresentamos ideias futuras para melhorar e continuar este trabalho.
 
+
+
+
 \section{Trabalho Relacionado}
 \label{sec_related_work}
-A análise de sentimento, no contexto de Processamento de Linguagem Natural, tem sido maioritariamente alvo de estudo em conteúdo gerado em redes redes sociais~\citep{10.1145/3185045} ou na avaliação de produtos ou serviços~\citep{pontiki-etal-2016-semeval}. Nestes domínios o autor do texto e o alvo da opinião são explícitos. No entanto, este tipo de abordagem não se aplica no contexto de análise de notícias de política, onde existe com frequência um sentimento expresso entre actores políticos sob a forma de relações de apoio ou oposição~\citep{balahur2009opinion, balahur-etal-2010-sentiment}.
+A análise de sentimento, no contexto de Processamento de Linguagem Natural, tem sido maioritariamente alvo de estudo em conteúdo gerado em redes sociais~\citep{10.1145/3185045} ou na avaliação de produtos ou serviços~\citep{pontiki-etal-2016-semeval}. Nestes domínios o autor do texto e o alvo da opinião são explícitos. No entanto, este tipo de abordagem não se aplica no contexto de análise de notícias de política, onde existe com frequência um sentimento expresso entre actores políticos sob a forma de relações de apoio ou oposição~\citep{balahur2009opinion, balahur-etal-2010-sentiment} e onde a direcção da relação de sentimento tem que ser considerada.
 
-% 2013 - https://aclanthology.org/P13-1108.pdf Learning to Extract International Relations from Political Context
-% 2019 - https://aclanthology.org/N19-1167.pdf No Permanent Friends or Enemies: Tracking Relationships between Nations from News
-Vários autores exploraram métodos para extrair relações de sentimento envolvendo actores políticos. Alguns autores exploram estas relações num contexto de política internacional, em que os actores políticos são  nações. \cite{oconnor-etal-2013-learning} propõem um modelo para inglês não supervisionado baseado em \textit{topic models} extraindo eventos ocorridos num determinado período de tempo envolvendo duas nações, e define um conjunto aberto de relações possíveis. \cite{han-etal-2019-permanent} geram de forma não supervisionada descritores de relações para pares de nações mencionadas em notícias em inglês recorrendo a \textit{embeddings} usados para classificar o texto que descreve a relação.
+Nesta secção descrevemos: recursos semelhantes aos que produzimos neste trabalho e que tornamos público, e abordagens para a tarefa de extracção de sentimento direccionado em texto de notícias de política.
+
+\subsection{Recursos e conjuntos de dados}
 
 % Datasets
 % 2009 - https://dl.acm.org/doi/abs/10.1145/1651461.1651468 - Automatic creation of a reference corpus for political opinion mining in user-generated content
 % 2013 - http://www.emeraldinsight.com/doi/abs/10.1108/00330331311313708 -  Tracking politics with POWER
 % 2015 - https://aclanthology.org/W15-5614/ - An Annotated Corpus for Sentiment Analysis in Political News
 % 2021 - https://www.sciencedirect.com/science/article/pii/S1877050921018755 - A dataset for Sentiment analysis of Entities in News headlines (SEN)
-Alguns autores disponibilizam dados anotados, \cite{de-arruda-etal-2015-annotated} criaram um corpus de notícias políticas em português, anotando cada parágrafo com o sentimento segundo duas dimensões: o actor político referido pela notícia, e o sentimento dessa referência: positivo, negativo ou neutro. \cite{BARANIAK20213627} disponibilizam corpora semelhante para inglês e polaco.
 
-\cite{10.1145/1651461.1651468} aplicou um método baseado em 
+\cite{10.1145/1651461.1651468} aplicaram um método baseado em 
 
 % Propomos e avaliamos um método para a criação automática de um corpus de referência para a formação de textos de classificação para a formação de opiniões políticas mineiras em tenda de con- tos de utilizadores. O processo começa com a compilação de uma colecção de comentários altamente opinativos publicados pelos utilizadores numa notícia em linha - papel. Em seguida, definimos e utilizamos um conjunto de regras de alta precisão elaboradas manualmente e apoiadas por um grande ícone de sentimentos, a fim de identificar frases em cada comentário que expressam opiniões sobre entidades políticas. Finalmente, as opiniões encontradas são propagadas às restantes frases do comentário que mencionam as mesmas entidades, aumentando assim o número e a variedade de frases de opinião. Os resultados mostram que a maioria das regras pode identificar opiniões negativas com muito grande precisão, e estas podem ser propagadas com segurança às restantes frases do comentário em quase 100\% dos casos. Devido a problemas decorrentes da ironia, a precisão da identificação cai para opiniões positivas, mas várias regras ainda atingem uma elevada precisão. A propagação de opiniões positivas é correcta em cerca de 77\% dos casos, e a maioria dos erros nesta fase resulta da inversão da ironia e da polaridade ao longo do comentário.
 
-\cite{moreira2013tracking}
+\cite{moreira2013tracking} disponibilizam uma ontologia descrevendo actores políticos, os seus cargos e partidos políticos afiliados usando fontes de informação oficiais e informação recolhida da \textit{web} para adicionar nomes alternativos às personalidades presentes na ontologia.
+
+\cite{de-arruda-etal-2015-annotated} criaram um corpus de notícias políticas em português do Brasil, anotando cada parágrafo com o sentimento segundo duas dimensões: o actor político referido pelo parágrafo, e o sentimento dessa referência: positivo, negativo ou neutro. Esta é uma tarefa algo diferente da proposta neste trabalho no sentido em que fica em aberto qual é a origem do sentimento. \cite{BARANIAK20213627} disponibilizam corpora semelhante, anotando o sentimento a uma entidade política em manchetes de jornais on-line, para o Inglês e Polaco.
 
 
-% 2017 - https://aclanthology.org/D17-1144.pdf
-\cite{cocarascu-toni-2017-identifying} propõem um método para classificar relações de apoio ou oposição para pares de secções de texto de debates políticos em inglês.
 
-% 2019 - Who Blames Whom in a Crisis? Detecting Blame Ties from News Articles Using Neural Networks 
+
+\subsection{Extracção de sentimento direccionado em texto de notícias}
+
+% 2013 - https://aclanthology.org/P13-1108.pdf Learning to Extract International Relations from Political Context
+% 2019 - https://aclanthology.org/N19-1167.pdf No Permanent Friends or Enemies: Tracking Relationships between Nations from News
+Vários autores exploraram métodos para extrair relações de sentimento envolvendo actores políticos. 
+
+% Alguns autores exploram estas relações num contexto de política internacional, em que os actores políticos são  nações. \cite{oconnor-etal-2013-learning} propõem um modelo para inglês não supervisionado baseado em \textit{topic models} extraindo eventos ocorridos num determinado período de tempo envolvendo duas nações, e define um conjunto aberto de relações possíveis. \cite{han-etal-2019-permanent} geram de forma não supervisionada descritores de relações para pares de nações mencionadas em notícias em inglês recorrendo a \textit{embeddings} usados para classificar o texto que descreve a relação.
+
+
+% 2019
+% Who Blames Whom in a Crisis? Detecting Blame Ties from News Articles Using Neural Networks 
 % https://ojs.aaai.org/index.php/AAAI/article/view/3842/3720
-\cite{liang2019blames} define a tarefa de extracção de relações de culpabilidade para textos em inglês: dado um artigo $d$ e um conjunto de entidades $E$, presentes no artigo, detectar se existe uma relação de culpabilidade $(s,t)$, onde $s,t \in E$, quando $s$ culpa $t$ com base no artigo $d$, sendo que há $\lvert{E}\rvert \cdot (\lvert{E}\rvert - 1)$, possíveis relações de culpabilidade.
-
+\cite{liang2019blames} define a tarefa de extracção de relações de culpabilidade para textos em inglês: dado um artigo $d$ e um conjunto de entidades $E$, presentes no artigo, detectar se existe uma relação de culpabilidade $(s,t)$, onde $s,t \in E$, quando $s$ culpa $t$ com base no artigo $d$, sendo que há $\lvert{E}\rvert \cdot (\lvert{E}\rvert - 1)$, possíveis relações de culpabilidade. Para detectar estas relações os autores propõem 3 modelos. O modelo \textit{Entity Prior} extrai informação sobre entidades, tentando capturar um \textit{prior} sobre quem é susceptível de culpar quem sem informação adicional. O modelo \textit{Context} faz uso da informação de contexto da frase onde duas entidades ocorrem para determinar a presença de uma relação de culpabilidade. Finalmente o modelo \textit{Combined} combina informação recolhida pelos dois modelos anteriores num único modelo. Os autores aplicam esta abordagem para textos em Inglês e reportam uma macro-média de F\textsubscript{1} de 0.70 com o modelo \textit{Combined}.
 
 % 2021
 % Who Blames or Endorses Whom? Entity-to-Entity Directed Sentiment Extraction in News Text
 % https://aclanthology.org/2021.findings-acl.358/
-No contexto de análise de notícias de política em português, e tanto quanto é do meu conhecimento, julgo este ser um dos primeiros trabalhos a propor um método para extrair de forma automática relações de apoio e oposição entre personalidades políticas de forma a poder construir um grafo semântico, seguindo a estrutura de relações proposta por~\cite{park-etal-2021-blames}: dada uma frase $s$ referindo duas entidades $p$ e $q$, detectar qual a relação de sentimento entre $p$ e $q$ de entre cinco possíveis: neutra, $p$ tem uma opinião positiva ou negativa em relação a $q$, ou $q$ tem uma opinião positiva ou negativa em relação a $p$.
+\cite{park-etal-2021-blames} propõe uma estrutura de relações para detectar o sentimento e a direcção: dada uma frase $s$ referindo duas entidades $p$ e $q$, detectar qual a relação de sentimento entre $p$ e $q$ de entre cinco possíveis: neutra, $p$ tem uma opinião positiva ou negativa em relação a $q$, ou $q$ tem uma opinião positiva ou negativa em relação a $p$. No seu trabalho os autores usam múltiplos modelos transformando a tarefa de extracção de sentimentos em sub-tarefas que respondem a perguntas de sim/não para cada um dos 5 sentimentos possíveis, combinando depois os vários resultados num resultado final. Esta abordagem é aplicada para Inglês, num corpus criado pelos autores e reportam uma macro-média de F\textsubscript{1} de 0.68.
+
+% No contexto de análise de notícias de política em português, e tanto quanto é do meu conhecimento, julgo este ser um dos primeiros trabalhos a propor um método para extrair de forma automática relações de apoio e oposição entre personalidades políticas para Português, e aplicando este método na construção de um grafo semântico, seguindo a estrutura de relações proposta por~\cite{park-etal-2021-blames}.
+
+
+
+
+
+
+
+
+
+
+
+
 
 \begin{table*}[!h]
   \centering
@@ -172,6 +206,8 @@ No contexto de análise de notícias de política em português, e tanto quanto 
   \caption{Exemplos de títulos e das relações manualmente anotadas correspondentes.}
   \label{tab:samples}
 \end{table*}
+
+
 
 \section{Base de Conhecimento}
 \label{sec_kb}
@@ -198,7 +234,6 @@ A principal fonte de notícias foi o arquivo da web portuguesa~\citep{SearchPast
 Uma segunda fonte de notícias foi a colecção CHAVE\footnote{\url{https://www.linguateca.pt/CHAVE/}}~\citep{DBLP:conf/clef/SantosR04, santos-rocha-2001-evaluating}, contendo os artigos do jornal PÚBLICO publicados entre 1994 e 1995. Finalmente, foram também acrescentados alguns artigos não arquivados pelo arquivo.pt, retirados directamente das secções {\it Mundo}, {\it Política} e {\it Sociedade} do site publico.pt. 
 
 Deste processo resultou uma colecção de cerca de 13,7 milhões de títulos de artigos publicados entre 1994 e 2022. De seguida foi aplicado um pré-processamento de modo a remover notícias com: títulos duplicados, títulos com menos de 4 palavras, e títulos ou URLs contendo palavras que fazem partem de uma lista pré-definida (e.g.: desporto, celebridades, artes, cinema, etc.) que sugerem um o outro contexto que não política. Este pré-processamento resultou em 1,3 milhões de títulos distintos, cerca de 10\% dos dados inicialmente recolhidos.
-
 
 \section{Colecção de Relações Anotadas}
 \label{sec:rel_data_annot}
@@ -229,6 +264,21 @@ Este processo resultou num conjunto de dados contendo 3.324 títulos anotados. P
 	\end{center}
 \end{table}
 
+
+
+% fazer uma comparação com este dataset
+
+% Positive (p → q) 1,656 
+% Negative (p → q) 3,163
+% Positive (p ← q) 327
+% Negative (p ← q) 478
+% p → q -> 4819
+% p ← q -> 805
+% Neutral 10,604
+
+
+
+
 % jq -r '"\(.ent1_id) \(.ent2_id)"' < politiquices_data_v3.0.jsonl | tr ' ' '\n' | sort | uniq -c | sort -gr
 
 \begin{figure}
@@ -248,19 +298,18 @@ Os dados anotados encontram-se online\footnote{\url{https://github.com/politiqui
 
 \begin{figure}[!h]
 \begin{Verbatim}[fontsize=\small]
-{"title": "Ana Gomes defende Durão Barroso",
-"label": "ent1_supports_ent2",
-"date": "2002-05-11 08:26:00",
-"url": "http://www.publico.pt/141932",
-"ent1": "Ana Gomes",
-"ent2": "Durão Barroso",
-"ent1_id": "Q2844986'",
-"ent2_id": "Q15849"}
+  {"title": "Ana Gomes defende Durão Barroso",
+   "label": "ent1_supports_ent2",
+   "date": "2002-05-11 08:26:00",
+   "url": "http://www.publico.pt/141932",
+   "ent1": "Ana Gomes",
+   "ent2": "Durão Barroso",
+   "ent1_id": "Q2844986'",
+   "ent2_id": "Q15849"}
 \end{Verbatim}
   \caption{Exemplo de um título anotado sob o formato JSON.}
   \label{fig:json_sample}
 \end{figure}
-
 
 \section{Processo de Extracção de Relações}
 \label{sec:classifiers}
@@ -553,7 +602,7 @@ Este trabalho também deixa em aberto oportunidades de realizar diversos estudos
 
 \section*{Agradecimentos}
 
-Gostaríamos de agradecer ao Nuno Feliciano por todos os comentários dados durante a elaboração deste trabalho e à equipa do Arquivo.PT por disponibilizar acesso aos dados arquivados através de uma API e pela consideração deste trabalho para os prémios Arquivo.PT 2021. Ao Edgar Felizardo e ao Tiago Cogumbreiro pelas revisões extensivas ao artigo, e também aos revisores por todos os comentários e correcções apontadas.
+Gostaríamos de agradecer ao Nuno Feliciano por todos os comentários dados durante a elaboração deste trabalho e à equipa do Arquivo.PT por disponibilizar acesso aos dados arquivados através de uma API e pela consideração deste trabalho para os prémios Arquivo.PT 2021. Ao Edgar Felizardo e ao Tiago Cogumbreiro pelas revisões extensivas ao artigo, e também aos revisores Sérgio Nunes e José Paulo Leal por todos os comentários e correcções apontadas.
 
 \bibliography{references.bib}
 
