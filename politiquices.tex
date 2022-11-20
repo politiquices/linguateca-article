@@ -129,13 +129,9 @@ As principais contribuições deste trabalho são:
 Este artigo está organizado da seguinte forma: na Secção~\ref{sec_related_work} referimos trabalho relacionado, na Secção~\ref{sec_kb} descrevemos a base de conhecimento usada no suporte de ligação das personalidades políticas à Wikidata. A Secção~\ref{sec:data_sources} refere e descreve as fontes de notícias utilizadas. Na Secção~\ref{sec:rel_data_annot} detalhamos o conjunto de dados anotados e na Secção~\ref{sec:classifiers} os classificadores de aprendizagem supervisionada desenvolvidos. Na Secção~\ref{sec:pipeline} descrevemos o processo de extracção de triplos RDF e a construção do gráfico semântico. Finalmente, na Secção~\ref{sec:future_work} apresentamos ideias futuras para melhorar e continuar este trabalho.
 
 
-
-
 \section{Trabalho Relacionado}
 \label{sec_related_work}
-A análise de sentimento, no contexto de Processamento de Linguagem Natural, tem sido maioritariamente alvo de estudo em conteúdo gerado em redes sociais~\citep{10.1145/3185045} ou na avaliação de produtos ou serviços~\citep{pontiki-etal-2016-semeval}. Nestes domínios o autor do texto e o alvo da opinião são explícitos. 
-
-No contexto de análise de notícias de política, onde existe com frequência um sentimento expresso entre actores políticos sob a forma de relações de apoio ou oposição~\citep{balahur2009opinion, balahur-etal-2010-sentiment}, as abordagens de análise de sentimento a produtos ou serviços não se aplicam, dado que a direcção da relação de sentimento tem que ser considerada.
+A análise de sentimento, no contexto de Processamento de Linguagem Natural, tem sido maioritariamente alvo de estudo em conteúdo gerado em redes sociais~\citep{10.1145/3185045} ou na avaliação de produtos ou serviços~\citep{pontiki-etal-2016-semeval}. Nestes domínios o autor do texto e o alvo da opinião são explícitos. No contexto de análise de notícias de política, onde existe com frequência um sentimento expresso entre actores políticos sob a forma de relações de apoio ou oposição~\citep{balahur2009opinion, balahur-etal-2010-sentiment}, as abordagens de análise de sentimento a produtos ou serviços não se aplicam, dado que a direcção da relação de sentimento tem que ser considerada.
 
 Nesta secção descrevemos: recursos semelhantes aos que produzimos neste trabalho e que tornamos públicos, e abordagens para a tarefa de extracção de sentimento direccionado em texto de notícias de política.
 
@@ -153,43 +149,25 @@ Nesta secção descrevemos: recursos semelhantes aos que produzimos neste trabal
 
 \cite{de-arruda-etal-2015-annotated} criaram um corpus de notícias políticas em português do Brasil, anotando cada parágrafo com o sentimento segundo duas dimensões: o actor político referido pelo parágrafo, e o sentimento dessa referência: positivo, negativo ou neutro. Neste recurso fica em aberto qual é a origem do sentimento. \cite{BARANIAK20213627} disponibilizam corpora semelhante, anotando o sentimento para com uma personalidade política em manchetes de jornais \textit{on-line}, para o Inglês e Polaco.
 
-
 \subsection{Extracção de sentimento direccionado em texto de notícias}
 
 Vários autores exploraram métodos para extrair sentimento envolvendo actores político. De notar que muitos dos trabalhos transformam a tarefa de detecção de sentimento numa tarefa de detecção de uma relação entre entidades mencionadas~\citep{bassignana-plank-2022-mean}.
 
 % 2013 - https://aclanthology.org/P13-1108.pdf Learning to Extract International Relations from Political Context
 % 2019 - https://aclanthology.org/N19-1167.pdf No Permanent Friends or Enemies: Tracking Relationships between Nations from News
-Alguns exploram estas relações num contexto de política internacional, i.e: os actores são nações em texto de notícias de política, sendo que algumas dessas relações implicitamente têm um sentimento positivo ou negativo. \cite{oconnor-etal-2013-learning} propõem um modelo não supervisionado baseado em \textit{topic models} e padrões linguísticos para identificar relações descrevendo conflitos entre nações referenciadas em artigos de notícias.
-
-
-\cite{han-etal-2019-permanent} 
-
-propõem também um modelo não supervisionado
-
-Aplicam este método a pares de nações mencionadas numa mesma frase em notícias em inglês.
-
-% para gerar de forma não supervisionada descritores de relações para pares de nações mencionadas em notícias em inglês.
-
-% Our model reconstructs textual information in the embedding space using relation embeddings, as proposed in Iyyer et al. (2016). We integrate simple yet effective linguistic insights: verbal predicates often describe the relationship between entities,1 while nouns and proper nouns provide the context of this relationship. For example, in “U.S. denounces Russia for its interference in the 2016 election”, denounce describes the relation, and election and interference provide the context. We show that this intuition leads the model to discover relation descriptors that are easier to interpret and less noisy.
-
-% In this section, we formally introduce our model that builds on Relation Modeling Network (RMN) (Iyyer et al., 2016). Our main contribution is to integrate shallow linguistic information (i.e., verbal predicates and nouns/proper nouns) and identify the context of relations.
-
-% For each pair of entities, we extract information from the predicates in sentences with both entities and reconstruct these predicates using shared relation embeddings. In addition, we use nouns to provide the context for the relations. We refer to our model as Linguistically Aware Relationship Networks (LARN).
-
-% We extract all the verbal predicates from these sentences in article a ∈ Aei,ej as {pa,ei,ej 1 , . . . , pa,ei,ej N }, as well as the proper nouns or nouns as {na,ei,ej 1 , . . . , na,ei,ej M }.
-
-
+Alguns exploram estas relações num contexto de política internacional, i.e: os actores são nações em texto de notícias de política, sendo que algumas dessas relações implicitamente têm um sentimento positivo ou negativo. \cite{oconnor-etal-2013-learning} propõem um modelo não supervisionado baseado em \textit{topic models} e padrões linguísticos para identificar relações, de forma aberta, descrevendo conflitos entre nações referenciadas em artigos de notícias em Inglês. \cite{han-etal-2019-permanent} propõem também um modelo não supervisionado para gerar descritores de relações para pares de nações mencionadas em notícias em Inglês.
+O modelo proposto estende o trabalho de \cite{iyyer-etal-2016-feuding} integrando informação linguística (i.e.: predicados verbais e substantivos comuns e próprios) por forma a identificar o contexto das relações.
 
 % 2019
 % Who Blames Whom in a Crisis? Detecting Blame Ties from News Articles Using Neural Networks 
 % https://ojs.aaai.org/index.php/AAAI/article/view/3842/3720
-\cite{liang2019blames} define a tarefa de extracção de relações de culpabilidade para textos em inglês: dado um artigo $d$ e um conjunto de entidades $E$, presentes no artigo, detectar se existe uma relação de culpabilidade $(s,t)$, onde $s,t \in E$, quando $s$ culpa $t$ com base no artigo $d$, sendo que há $\lvert{E}\rvert \cdot (\lvert{E}\rvert - 1)$, possíveis relações de culpabilidade. Para detectar estas relações os autores propõem 3 modelos. O modelo \textit{Entity Prior} extrai informação sobre entidades, tentando capturar um \textit{prior} sobre quem é susceptível de culpar quem sem informação adicional. O modelo \textit{Context} faz uso da informação de contexto da frase onde duas entidades ocorrem para determinar a presença de uma relação de culpabilidade. Finalmente o modelo \textit{Combined} combina informação recolhida pelos dois modelos anteriores num único modelo. Os autores aplicam esta abordagem para textos em Inglês e reportam uma macro-média de F\textsubscript{1} de 0.70 com o modelo \textit{Combined}.
+\cite{liang2019blames} define a tarefa de extracção de relações de culpabilidade para textos em inglês: dado um artigo $d$ e um conjunto de entidades $E$, presentes no artigo, detectar se existe uma relação de culpabilidade $(s,t)$, onde $s,t \in E$, quando $s$ culpa $t$ com base no artigo $d$, sendo que há $\lvert{E}\rvert \cdot (\lvert{E}\rvert - 1)$, possíveis relações de culpabilidade. Para detectar estas relações os autores propõem 3 modelos. O modelo \textit{Entity Prior} extrai informação sobre entidades, tentando capturar um \textit{prior} sobre quem é susceptível de culpar quem sem informação adicional. O modelo \textit{Context} faz uso da informação de contexto da frase onde duas entidades ocorrem para determinar a presença de uma relação de culpabilidade. Finalmente o modelo \textit{Combined} combina informação recolhida pelos dois modelos anteriores num único modelo. Os autores aplicam esta abordagem num corpus com 998 artigos de notícias em Inglês com cerca de 3 entidades por artigo e reportam uma macro-média F\textsubscript{1} de 0,70 com o modelo \textit{Combined}.
 
 % 2021
 % Who Blames or Endorses Whom? Entity-to-Entity Directed Sentiment Extraction in News Text
 % https://aclanthology.org/2021.findings-acl.358/
-\cite{park-etal-2021-blames} propõe uma estrutura de relações para detectar o sentimento e a direcção: dada uma frase $s$ referindo duas entidades $p$ e $q$, detectar qual a relação de sentimento entre $p$ e $q$ de entre cinco possíveis: neutra, $p$ tem uma opinião positiva ou negativa em relação a $q$, ou $q$ tem uma opinião positiva ou negativa em relação a $p$. No seu trabalho os autores usam múltiplos modelos transformando a tarefa de extracção de sentimentos em sub-tarefas que respondem a perguntas de sim/não para cada um dos 5 sentimentos possíveis, combinando depois os vários resultados num resultado final. Esta abordagem é aplicada para Inglês, num corpus criado pelos autores e reportam uma macro-média de F\textsubscript{1} de 0.68.
+\cite{park-etal-2021-blames} propõe uma estrutura de relações para detectar o sentimento e a direcção: dada uma frase $s$ referindo duas entidades $p$ e $q$, detectar qual a relação de sentimento entre $p$ e $q$ de entre cinco possíveis: neutra, $p$ tem uma opinião positiva ou negativa em relação a $q$, ou $q$ tem uma opinião positiva ou negativa em relação a $p$. No seu trabalho os autores usam múltiplos modelos transformando a tarefa de extracção de sentimentos em sub-tarefas que respondem a perguntas de sim/não para cada um dos 5 sentimentos possíveis, combinando depois os vários resultados num resultado final. Esta abordagem é aplicada para Inglês num corpus criado pelos autores contendo frases de artigos de notícias contento pelo menos duas entidades, e anotado duas entidades e um dos 5 sentimentos possíveis entre as duas entidades. Os autores reportam uma macro-média de F\textsubscript{1} de 0,68.
+
 
 
 \begin{table*}[!h]
@@ -198,8 +176,10 @@ Aplicam este método a pares de nações mencionadas numa mesma frase em notíci
       {\bf Título} & {\bf Relação} \\
       \hline
 	  \textbf{Sá Fernandes} acusa \textbf{António Costa} de defender interesses corporativos &	Ent\textsubscript{1}-opõe-se-Ent\textsubscript{2} \\
+	  \textbf{Joana Mortágua}: declarações de \textbf{Cavaco} são "uma série de disparates" & Ent\textsubscript{1}-opõe-se-Ent\textsubscript{2} \\
 	  \textbf{Passos Coelho} é acusado de imaturidade política por \textbf{Santos Silva} &	Ent\textsubscript{2}-opõe-se-Ent\textsubscript{1}	\\
-	  \textbf{Manuel Alegre} apoia candidatura de \textbf{Maria de Belém} &	Ent\textsubscript{1}-apoia-Ent\textsubscript{2}	\\
+	  \textbf{Durão Barroso} defende \textbf{Paulo Portas} como "excelente ministro" & Ent\textsubscript{1}-apoia-Ent\textsubscript{2}	\\
+	  \textbf{Armando Vara} escolhido por \textbf{Guterres} para coordenar autárquicas" & Ent\textsubscript{2}-apoia-Ent\textsubscript{1}	\\
 	  \textbf{Manuel Alegre} recebe apoio de \textbf{Jorge Sampaio} & Ent\textsubscript{2}-apoia-Ent\textsubscript{1}	\\
 	  \textbf{Rui Tavares} e \textbf{Ana Drago} eleitos nas primárias do LIVRE & outra	\\
 	  \textbf{Teresa Zambujo} reconhece vitória de \textbf{Isaltino Morais} & outra	\\
@@ -209,8 +189,6 @@ Aplicam este método a pares de nações mencionadas numa mesma frase em notíci
   \caption{Exemplos de títulos e das relações manualmente anotadas correspondentes.}
   \label{tab:samples}
 \end{table*}
-
-
 
 \section{Base de Conhecimento}
 \label{sec_kb}
@@ -245,7 +223,7 @@ De forma a poder treinar classificadores de aprendizagem supervisionada para ide
 
 Começamos por pré-processar todos os títulos recolhidos usando o pacote de software spaCy 3.0~\citep{spacy}, com o modelo~\texttt{pt\_core\_news\_lg-3.0.0} fizemos o reconhecimento de entidades mencionadas do tipo \texttt{PESSOA}. Para cada entidade reconhecida tentamos encontrar o seu identificador correspondente na Wikidata fazendo uma interrogação ao índice descrito na Secção~\ref{sec_kb} e assumindo que na lista de resultados o primeiro é o identificador correcto associado à entidade. Seleccionámos depois apenas títulos referindo duas personalidades e ambas associadas a um identificador Wikidata.
 
-Seleccionamos aleatoriamente títulos pré-processados e corrigimos sempre que necessário as entidades reconhecidos e os seus identificadores na Wikidata. Para cada título anotámos a relação existente: \textbf{oposição} ou \textbf{apoio}, e a direcção da mesma. Quando nenhuma das duas se verifica a relação é anotada como \textbf{outra}. A Tabela~\ref{tab:samples} demonstra alguns exemplos das relações anotadas.
+Seleccionamos aleatoriamente títulos pré-processados e corrigimos sempre que necessário as entidades reconhecidos e os seus identificadores na Wikidata. Para cada título anotámos a relação existente: \textbf{oposição} ou \textbf{apoio}, e a direcção da mesma. Quando nenhuma das duas se verifica a relação é anotada como \textbf{outra}. A Tabela~\ref{tab:samples} demonstra alguns exemplos das relações anotadas. O processo de anotação foi feito por um anotador. Nas situações mais ambíguas, por exemplo, onde é necessária a informação no texto da notícia para decidir, as relações foram anotados como \textbf{outra}.
 
 Este processo resultou num conjunto de dados contendo 3.324 títulos anotados. Para cada título anotámos apenas duas personalidades e a relação entre elas, mesmo que os títulos contenham referências a mais do que duas personalidades. A Tabela~\ref{tab:rel_dataset} caracteriza os dados em termos de número de relações e direcção. A maioria dos títulos contém uma relação de \textbf{oposição} ou \textbf{outra}, e a grande maioria das relações têm uma direcção da primeira para a segunda entidade, Ent\textsubscript{1}$\rightarrow$Ent\textsubscript{2}.
 
@@ -267,20 +245,22 @@ Este processo resultou num conjunto de dados contendo 3.324 títulos anotados. P
 	\end{center}
 \end{table}
 
-
+O ratio de relações de oposição para com relações de apoio é de 1,6 semelhante com os dados para Inglês disponibilizados por~\cite{park-etal-2021-blames}, onde esta mesma relação entre as duas classes é de 1,8. Também em termos do tamanho das classes, sendo a classe \textbf{outra} a mais presente nos dados seguindo-se a de \textbf{oposição} e \textbf{apoio}.
 
 % fazer uma comparação com este dataset
+% Negative:  3,163 + 478 ->  3 641 -> 22%
+% Positive:  1,656 + 327 ->  1 983 -> 12%
+% Neutral : 10,604	     -> 10 604 -> 65%
 
-% Positive (p → q) 1,656 
 % Negative (p → q) 3,163
+% Positive (p → q) 1,656 
 % Positive (p ← q) 327
 % Negative (p ← q) 478
-% p → q -> 4819
-% p ← q -> 805
-% Neutral 10,604
 
-
-
+% p → q -> 4819  (29%)
+% p ← q -> 805   (5%)
+% Neutral 10,604 (65%)
+% 16.228
 
 % jq -r '"\(.ent1_id) \(.ent2_id)"' < politiquices_data_v3.0.jsonl | tr ' ' '\n' | sort | uniq -c | sort -gr
 
@@ -291,17 +271,17 @@ Este processo resultou num conjunto de dados contendo 3.324 títulos anotados. P
   \label{fig:ent_power_law}
 \end{figure}
 
-Das 6.648 menções a nomes de personalidades políticas anotadas, 515 são distintas e têm um identificador na Wikidata, 129 entidades distintas, identificadas por agregação da \textit{string} que as refere no título, não estão associadas a um identificador por não estarem presentes na  Wikidata. 
+Das 6.648 menções a nomes de personalidades políticas anotadas, 515 são distintas e têm um identificador na Wikidata, 129 entidades distintas, identificadas por agregação da \textit{string} que as refere no título, não estão associadas a um identificador por não estarem presentes na Wikidata. 
 
-Analisando a frequência de ocorrência de cada entidade observa-se que há pequeno número de entidades responsáveis por uma grande parte de todas as ocorrências de entidades nos dados anotados. Como mostra a Figura~\ref{fig:ent_power_law} existe um número pequeno de entidades frequentes, e uma longa lista de entidades pouco frequentes, em concreto, 96 (19\%) das personalidades são responsáveis por 80\% das menções.
+Analisando a frequência de ocorrência de cada entidade observa-se que há pequeno número de entidades responsáveis por uma grande parte de todas as ocorrências de entidades nos dados anotados. Como mostra a Figura~\ref{fig:ent_power_law} existe um número pequeno de entidades frequentes, e uma longa lista de entidades pouco frequentes, em concreto, 96 personalidades distintas, i,.e.: 19\% das personalidades, são responsáveis por 80\% das menções a personalidades nos dados.
+
+A Tabela~\ref{tab:caracterization_rel_dataset} caracteriza os dados em termos de número de palavras contidas no título, excluindo as palavras que fazem parte das entidades.
 
 
-A Tabela~\ref{tab:caracterization_rel_dataset} caracteriza os dados em termos de número de palavras contidas no título, excluindo as palavras que fazem parte das entidades referentes a personalidades políticas.
-
-\begin{table}[!h]
+\begin{table}[]
     \begin{center}
-    \begin{tabular}{l ccr}
-        {\bf Relação} & {\bf Mediana} & {\bf Max.} & {\bf Min.} \\
+    \begin{tabular}{l rrr}
+        {\bf Relação} & {\bf Mediana} & {\bf Máximo} & {\bf Minímo} \\
         \hline
         opõe-se       &    8 &  22   &  1   \\
         apoia         &    7 &  17   &  1  \\
@@ -312,12 +292,9 @@ A Tabela~\ref{tab:caracterization_rel_dataset} caracteriza os dados em termos de
 	\end{center}
 \end{table}
 
-
-O processo de anotação foi feito por apenas um anotador e sendo que a tarefa de anotação gera alguma ambiguidade muitas das relações foram anotados como \textbf{outra}. 
-
 Os dados anotados encontram-se online\footnote{\url{https://github.com/politiquices/data-releases}} sob o formato JSON como ilustrado na Figura~\ref{fig:json_sample}.
 
-\begin{figure}[!h]
+\begin{figure}[]
 \begin{Verbatim}[fontsize=\small]
   {"title": "Ana Gomes defende Durão Barroso",
    "label": "ent1_supports_ent2",
@@ -477,7 +454,7 @@ Avaliámos diferentes abordagens para a classificação supervisionada das rela�
 
 Para o classificador SVM utilizámos como \textit{features} uma abordagem baseada em vectores TF-IDF~\citep{DBLP:journals/ipm/SaltonB88}, fazendo um pré-processamento do título, usando um padrão, de modo a identificar o contexto relevante, i.e.: o contexto no título que contém informação que descreve a relação: \texttt{<Ent\textsubscript{1} X Ent\textsubscript{2} \textbf{contexto}>} onde \texttt{X} = \{\textit{“diz a”, “responde a”, “sugere a”, “diz que, “afirma que”, “espera que”, “defende que”, “considera que”, “sugere que”, “quer saber se”, “considera”, “manda”}\}. Sempre que o padrão não se verifica usamos todas as palavras do título para construir o vector, excepto o nome das personalidades.
 
-A rede neuronal recorrente LSTM foi usada numa arquitectura bidireccional, ou seja duas LSTMs, ambas com uma dimensão de 128, uma lendo o título da primeira para a última palavra e outra da última para a primeira palavra, sendo que os dois estados finais de cada LSTM são concatenados e passados a um \textit{layer} linear. Usamos \textit{embeddings} pré-treinados para Português baseados no método FastText (\textit{skip-gram}) de dimensão 50~\citep{hartmann-etal-2017-portuguese}. A rede foi treinada por 5 \textit{epochs} com um \textit{batch size} de 8.
+A rede neuronal recorrente LSTM foi usada numa arquitectura bidireccional, ou seja, são usadas duas redes LSTM, ambas com uma dimensão de 128, uma lendo o título da primeira para a última palavra e outra da última para a primeira palavra, sendo que os dois estados finais de cada LSTM são concatenados e passados a um \textit{layer} linear. Usamos \textit{embeddings} pré-treinados para Português baseados no método FastText (\textit{skip-gram}) de dimensão 50~\citep{hartmann-etal-2017-portuguese}. A rede foi treinada por 5 \textit{epochs} com um \textit{batch size} de 8.
 %optimizer = optim.Adam(model.parameters())
 %criterion = nn.BCELoss()
 
@@ -619,7 +596,7 @@ Como trabalho futuro gostaríamos de explorar o texto da notícia de forma a com
 
 Alguns títulos contêm uma relação mútua: \textit{``Sócrates e Alegre trocam acusações sobre co-incineração"} ou \textit{``Pinto da Costa rebate críticas de Pacheco Pereira"}, poderiam ser classificados com a direcção Ent\textsubscript{2}$\leftrightarrow$Ent\textsubscript{1}, indicando neste caso que ambas as personalidades se acusam.
 
-Este trabalho também deixa em aberto oportunidades de realizar diversos estudos com base na estrutura do grafo, por exemplo: encontrar comunidades de apoio e oposição em função do tempo e verificar quais mudanças entre dentro dessas comunidades ou por estudar triângulos políticos: se as personalidades políticas X e Y sempre acusam ou defendem uma terceira personalidade Z, qual será a relação típica entre X e Y?
+Este trabalho também deixa em aberto oportunidades de realizar diversos estudos com base na estrutura do grafo, por exemplo: encontrar comunidades de apoio e oposição em função do tempo e verificar quais mudanças entre dentro dessas comunidades ou por estudar triângulos políticos: se duas personalidades políticas, X e Y, sempre acusam ou defendem uma terceira personalidade Z, qual será a relação típica expectável entre X e Y?
 
 \section*{Agradecimentos}
 
