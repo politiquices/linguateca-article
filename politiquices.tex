@@ -176,10 +176,10 @@ O modelo proposto estende o trabalho de \cite{iyyer-etal-2016-feuding} integrand
       {\bf Título} & {\bf Relação} \\
       \hline
 	  \textbf{Sá Fernandes} acusa \textbf{António Costa} de defender interesses corporativos &	Ent\textsubscript{1}-opõe-se-Ent\textsubscript{2} \\
-	  \textbf{Joana Mortágua}: declarações de \textbf{Cavaco} são "uma série de disparates" & Ent\textsubscript{1}-opõe-se-Ent\textsubscript{2} \\
+	  \textbf{Joana Mortágua}: declarações de \textbf{Cavaco} são ``uma série de disparates" & Ent\textsubscript{1}-opõe-se-Ent\textsubscript{2} \\
 	  \textbf{Passos Coelho} é acusado de imaturidade política por \textbf{Santos Silva} &	Ent\textsubscript{2}-opõe-se-Ent\textsubscript{1}	\\
-	  \textbf{Durão Barroso} defende \textbf{Paulo Portas} como "excelente ministro" & Ent\textsubscript{1}-apoia-Ent\textsubscript{2}	\\
-	  \textbf{Armando Vara} escolhido por \textbf{Guterres} para coordenar autárquicas" & Ent\textsubscript{2}-apoia-Ent\textsubscript{1}	\\
+	  \textbf{Durão Barroso} defende \textbf{Paulo Portas} como ``excelente ministro" & Ent\textsubscript{1}-apoia-Ent\textsubscript{2}	\\
+	  \textbf{Armando Vara} escolhido por \textbf{Guterres} para coordenar autárquicas & Ent\textsubscript{2}-apoia-Ent\textsubscript{1}	\\
 	  \textbf{Manuel Alegre} recebe apoio de \textbf{Jorge Sampaio} & Ent\textsubscript{2}-apoia-Ent\textsubscript{1}	\\
 	  \textbf{Rui Tavares} e \textbf{Ana Drago} eleitos nas primárias do LIVRE & outra	\\
 	  \textbf{Teresa Zambujo} reconhece vitória de \textbf{Isaltino Morais} & outra	\\
@@ -221,9 +221,11 @@ Deste processo resultou uma colecção de cerca de 13,7 milhões de títulos de 
 
 De forma a poder treinar classificadores de aprendizagem supervisionada para identificar as relações presentes nos títulos das notícias, e fazer a ligação das personalidades com a Wikidata, anotámos manualmente títulos com: as menções a personalidades, os identificadores na Wikidata e a relação entre as personalidades mencionadas.
 
-Começamos por pré-processar todos os títulos recolhidos usando o pacote de software spaCy 3.0~\citep{spacy}, com o modelo~\texttt{pt\_core\_news\_lg-3.0.0} fizemos o reconhecimento de entidades mencionadas do tipo \texttt{PESSOA}. Para cada entidade reconhecida tentamos encontrar o seu identificador correspondente na Wikidata fazendo uma interrogação ao índice descrito na Secção~\ref{sec_kb} e assumindo que na lista de resultados o primeiro é o identificador correcto associado à entidade. Seleccionámos depois apenas títulos referindo duas personalidades e ambas associadas a um identificador Wikidata.
+Começamos por pré-processar todos os títulos recolhidos usando o pacote de software spaCy 3.0~\citep{spacy}, com o modelo~\texttt{pt\_core\_news\_lg-3.0.0} fizemos o reconhecimento de entidades mencionadas do tipo \texttt{PESSOA}. Para cada entidade reconhecida tentamos encontrar o seu identificador correspondente na Wikidata fazendo uma interrogação ao índice descrito na Secção~\ref{sec_kb} e assumindo que na lista de resultados o primeiro é o identificador correcto associado à entidade. Seleccionamos depois os títulos para anotação, incluindo apenas títulos referindo pelos menos duas personalidades.
 
-Seleccionamos aleatoriamente títulos pré-processados e corrigimos sempre que necessário as entidades reconhecidos e os seus identificadores na Wikidata. Para cada título anotámos a relação existente: \textbf{oposição} ou \textbf{apoio}, e a direcção da mesma. Quando nenhuma das duas se verifica a relação é anotada como \textbf{outra}. A Tabela~\ref{tab:samples} demonstra alguns exemplos das relações anotadas. O processo de anotação foi feito por um anotador. Nas situações mais ambíguas, por exemplo, onde é necessária a informação no texto da notícia para decidir, as relações foram anotados como \textbf{outra}.
+No processo de anotação todos os títulos foram carregados para ferramenta de anotação Argilla\footnote{\url{https://github.com/argilla-io/argilla}}, e usando o interface gráfico fomos selecionando títulos para anotar. 
+
+Para cada título corrigimos sempre que necessário as entidades reconhecidas e os seus identificadores na Wikidata, caso existam. Anotámos a relação existente: \textbf{oposição} ou \textbf{apoio}, e a direcção da mesma. Quando nenhuma das duas se verifica a relação é anotada como \textbf{outra}. A Tabela~\ref{tab:samples} demonstra alguns exemplos das relações anotadas. O processo de anotação foi feito por um anotador. Nas situações mais ambíguas, por exemplo, onde é necessária a informação no texto da notícia para decidir, as relações foram anotados como \textbf{outra}.
 
 Este processo resultou num conjunto de dados contendo 3.324 títulos anotados. Para cada título anotámos apenas duas personalidades e a relação entre elas, mesmo que os títulos contenham referências a mais do que duas personalidades. A Tabela~\ref{tab:rel_dataset} caracteriza os dados em termos de número de relações e direcção. A maioria dos títulos contém uma relação de \textbf{oposição} ou \textbf{outra}, e a grande maioria das relações têm uma direcção da primeira para a segunda entidade, Ent\textsubscript{1}$\rightarrow$Ent\textsubscript{2}.
 
@@ -245,7 +247,7 @@ Este processo resultou num conjunto de dados contendo 3.324 títulos anotados. P
 	\end{center}
 \end{table}
 
-O ratio de relações de oposição para com relações de apoio é de 1,6 semelhante com os dados para Inglês disponibilizados por~\cite{park-etal-2021-blames}, onde esta mesma relação entre as duas classes é de 1,8. Também em termos do tamanho das classes, sendo a classe \textbf{outra} a mais presente nos dados seguindo-se a de \textbf{oposição} e \textbf{apoio}.
+O ratio de relações de oposição para com relações de apoio é de 1,6 semelhante com os dados para Inglês disponibilizados por~\cite{park-etal-2021-blames}, onde esta mesma relação entre as duas classes é de 1,8.  A mesma propriedade entre os dois conjuntos de dados também se verifica na representatividade das classes, sendo a classe \textbf{outra} a mais presente em ambos os conjuntos de dados seguindo-se\textbf{oposição} e por último \textbf{apoio}.
 
 % fazer uma comparação com este dataset
 % Negative:  3,163 + 478 ->  3 641 -> 22%
@@ -271,12 +273,14 @@ O ratio de relações de oposição para com relações de apoio é de 1,6 semel
   \label{fig:ent_power_law}
 \end{figure}
 
-Das 6.648 menções a nomes de personalidades políticas anotadas, 515 são distintas e têm um identificador na Wikidata, 129 entidades distintas, identificadas por agregação da \textit{string} que as refere no título, não estão associadas a um identificador por não estarem presentes na Wikidata. 
+Das 6.648 menções a nomes de personalidades políticas anotadas, 515 são distintas e têm um identificador na Wikidata. Um total de 129 entidades distintas, identificadas por agregação da \textit{string} que as refere no título, não estão associadas a um identificador por não estarem presentes na Wikidata. 
 
 Analisando a frequência de ocorrência de cada entidade observa-se que há pequeno número de entidades responsáveis por uma grande parte de todas as ocorrências de entidades nos dados anotados. Como mostra a Figura~\ref{fig:ent_power_law} existe um número pequeno de entidades frequentes, e uma longa lista de entidades pouco frequentes, em concreto, 96 personalidades distintas, i,.e.: 19\% das personalidades, são responsáveis por 80\% das menções a personalidades nos dados.
 
-A Tabela~\ref{tab:caracterization_rel_dataset} caracteriza os dados em termos de número de palavras contidas no título, excluindo as palavras que fazem parte das entidades.
+Em termos de número de palavras contidas no título, excluindo palavras que fazem parte das entidades envolvidas numa relação, têm um mediana de 8 palavras com um máximo de 22 e um mínimo de 1.
 
+\begin{comment}
+A Tabela~\ref{tab:caracterization_rel_dataset} caracteriza os dados em termos de número de palavras contidas no título, excluindo todas as palavras que fazem parte das entidades mencionadas que estão envolvidas numa relação anotada.
 
 \begin{table}[]
     \begin{center}
@@ -291,10 +295,11 @@ A Tabela~\ref{tab:caracterization_rel_dataset} caracteriza os dados em termos de
 	\label{tab:caracterization_rel_dataset}
 	\end{center}
 \end{table}
+\end{comment}
 
-Os dados anotados encontram-se online\footnote{\url{https://github.com/politiquices/data-releases}} sob o formato JSON como ilustrado na Figura~\ref{fig:json_sample}.
+Este conjunto de dados anotados encontram-se online\footnote{\url{https://github.com/politiquices/data-releases}} sob o formato JSON como ilustrado na Figura~\ref{fig:json_sample}.
 
-\begin{figure}[]
+\begin{figure}[!h]
 \begin{Verbatim}[fontsize=\small]
   {"title": "Ana Gomes defende Durão Barroso",
    "label": "ent1_supports_ent2",
@@ -516,10 +521,10 @@ A Tabela~\ref{tab:results_relacao} descreve os resultados para os vários classi
 \begin{itemize}
 \item{\textit{José Lello diz que Nogueira Leite quer “abifar uns tachos”}}
 \item{\textit{Louçã diz que “António Borges é o grilo falante” de Passo Coelho}}
-\item{\textit{Louçã acusa Passos de ser o “cangalheiro da melhor maternidade” do país}}
+%\item{\textit{Louçã acusa Passos de ser o “cangalheiro da melhor maternidade” do país}}
 \end{itemize}
 
-Outros relações são ambíguas e difíceis de classificar sem mais contexto do que aquele presente no título. No conjunto de dados que tornamos público, todos os títulos contêm um URL para o texto da notícia.
+Outras relações são ambíguas e difíceis de classificar sem mais contexto do que aquele presente no título. No conjunto de dados que tornamos público, todos os títulos contêm um URL para o texto da notícia.
 
 \begin{table*}
   \centering
@@ -542,9 +547,7 @@ Outros relações são ambíguas e difíceis de classificar sem mais contexto do
 \subsection{Classificador de Direção da Relação}
 \label{subsec:rel_direction}
 
-O classificador da direcção tem 2 classes possíveis, Ent\textsubscript{1}$\rightarrow$Ent\textsubscript{2} ou Ent\textsubscript{1}$\leftarrow$Ent\textsubscript{2}. 
-
-Como mostra a Tabela~\ref{tab:rel_dataset}, o conjunto de dados tem um viés para com a classe Ent\textsubscript{1}$\rightarrow$Ent\textsubscript{2} representando 91,5\% dos dados. Assim, optamos por desenvolver uma abordagem baseada em regras para detectar apenas a classe Ent\textsubscript{1}$\leftarrow$Ent\textsubscript{2}, e sempre que nenhuma das regras se verifica o classificador atribui a classe Ent\textsubscript{1}$\rightarrow$Ent\textsubscript{2}.
+O classificador da direcção tem 2 classes possíveis. Como mostra a Tabela~\ref{tab:rel_dataset}, o conjunto de dados tem um viés para com a classe Ent\textsubscript{1}$\rightarrow$Ent\textsubscript{2} representando 91,5\% dos dados. Assim, optamos por desenvolver uma abordagem baseada em regras para detectar apenas a classe Ent\textsubscript{1}$\leftarrow$Ent\textsubscript{2}, e sempre que nenhuma das regras se verifica o classificador atribui a classe Ent\textsubscript{1}$\rightarrow$Ent\textsubscript{2}.
 
 Definimos regras baseadas em padrões construídos com informação morfológica e sintáctica~\citep{nivre-etal-2020-universal} extraída do título com o spaCy, usando o mesmo modelo descrito na Secção~\ref{sec:rel_data_annot}. Extraímos a informação morfo-sintáctica de todas as palavras, incluindo para os verbos informação sobre a conjugação: a pessoa e o número;
 
