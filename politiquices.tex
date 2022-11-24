@@ -59,7 +59,7 @@ Os títulos de notícias de política relatam com frequência interacções envo
 
 Neste trabalho, analisámos centenas de milhares de títulos de notícias de artigos arquivados, identificando aqueles que expressam relações de apoio ou oposição entre duas personalidade políticas. Neste processo também associámos as personalidades políticas com o seu identificador na Wikidata. 
 
-Este processo resultou num grafo semântico onde os nós são personalidades representadas na Wikidata ligadas através de vértices representando relações de oposição ou apoio suportadas por uma notícia. O grafo permite responder a diferentes tipos de interrogações envolvendo personalidades políticas e partidos, e.g.: \textit{Que personalidades do BE se opuseram a personalidades do PCP?}, \textit{Quem do PS se opôs/apoiou a José Sócrates?}, \textit{Que personalidades do PS apoiaram personalidades do PSD?}
+Este processo resultou num grafo semântico onde os nós são personalidades representadas na Wikidata ligadas através de vértices representando relações de oposição ou apoio suportadas por uma notícia. O grafo permite responder a diferentes tipos de interrogações envolvendo personalidades políticas e partidos, e.g.: \textit{Que personalidades do BE se opuseram a personalidades do PCP?}, \textit{Quem do PS apoiou/se opôs a José Sócrates?}, \textit{Que personalidades do PS apoiaram personalidades do PSD?}
 
 Neste artigo descrevemos o processo de extracção dos triplos que compõem o grafo semântico e tornamos acessível uma colecção de dados anotada manualmente. A colecção de dados anotada permitiu treinar classificadores de aprendizagem supervisionada para identificar as relações expressas nos títulos e ligar as personalidades referidas com a Wikidata. 
 
@@ -76,20 +76,20 @@ No contexto de análise de notícias de política em Português, e tanto quanto 
 
 Political news headlines often report on interactions involving political personalities, many of these interactions correspond to relationships of support or opposition from one personality to another, for example: \textit{``Marques Mendes criticizes Rui Rio's strategy"} or \textit{``Costa reaffirms confidence in Centeno"}
 
-In this work, we analyzed hundreds of thousands of archived news titles identifying those that express support or opposition relationships between two political personalities. In this process we also associated the political personalities with their identifier in Wikidata. 
+In this work, we analysed hundreds of thousands of archived news titles identifying those that express support or opposition relationships between two political personalities. In this process we also associated the political personalities with their unique identifier in Wikidata. 
 
 This process resulted in a semantic graph where the nodes are personalities represented by Wikidata identifiers and connected through vertices representing opposition or support relationships supported by a news article. The graph allows answering different types of queries involving political personalities and parties, e.g.: \textit{Which BE personalities opposed Jerónimo de Sousa?}, \textit{Which BE personalities opposed PCP personalities?}, \textit{Who from the PS opposed/supported José Sócrates?}, \textit{Which PS personalities have supported PSD personalities?}.
 
-In this paper we describe the process of extracting the triples that make up the semantic graph and we make publicly a manually annotated dataset. The dataset allowed us to train supervised classifiers to identify the relationships expressed in the titles and to link the referred personalities to Wikidata. 
+In this paper we describe the process of extracting the semantic triples that make up the semantic graph and we make publicly available a manually annotated dataset. The dataset allowed us to train supervised machine learning classifiers to automatically identify the relationships expressed in the titles and to link the referred personalities to Wikidata. 
 
-We also made publicly available the graph resulting from the extraction process, containing a total of 680 political personalities and refering more than 10,000 news stories covering a period of about 25 years.
+We also made publicly available the graph resulting from the extraction process, containing a total of 680 political personalities and referring more than 10,000 news stories covering a period of about 25 years.
 
 In the context of political news analysis in Portuguese, and to the best of our knowledge, this is a seminal work, proposing a method to extract relationships of support and opposition between political personalities.
 
 \end{abstract}
 
 %% add the keywords in English
-\keywords{semantic relationships extraction, annotated dataset, semantic web, RDF, NLP, political science}
+\keywords{semantic relationship extraction, annotated dataset, semantic web, RDF, NLP, political science}
 
 \section{Introdução}
 \label{sec:intro}
@@ -108,32 +108,31 @@ Tendo um método automático para extrair relações e podendo aplicá-lo a uma 
 
 Neste trabalho apresentamos um método para extrair relações de apoio ou oposição entre personalidades políticas e descrevemos os resultados da aplicação do mesmo a uma colecção de notícias abrangendo um período de cerca de 25 anos. Durante o processo de extracção das relações ligamos as personalidades políticas envolvidas com o seu identificador na Wikidata~\citep{MKGGB2018} enriquecendo assim a relação com informação associada à personalidade (e.g.: afiliação política, cargos públicos exercidos, legislaturas, relações familiares, etc.). 
 
-Todas as relações extraídas são representadas sob a forma de triplos semânticos seguindo a norma Resource Description Framework (RDF)~\citep{schreiber2014primer}. As personalidades políticas envolvidas, representadas pelo seu identificador na Wikidata, são ligadas através de uma relação de oposição ou apoio representada pela notícia que dá suporte à relação, dando assim origem a um gráfico semântico. Desta forma é então possível formular interrogações SPARQL~\citep{2013sparql} envolvendo a informação da Wikidata associada a cada personalidade e as relações extraídas dos títulos de notícias, por exemplo:
+Todas as relações extraídas são representadas sob a forma de triplos semânticos seguindo a norma Resource Description Framework (RDF)~\citep{schreiber2014primer}. As personalidades políticas envolvidas, representadas pelo seu identificador na Wikidata, são ligadas através de uma relação de oposição ou apoio representada pela notícia que dá suporte à relação. Esta estrutura dá assim origem a um gráfico semântico, sendo então possível formular interrogações SPARQL~\citep{2013sparql} envolvendo a informação da Wikidata associada a cada personalidade e as relações extraídas dos títulos de notícias, por exemplo:
 
 \begin{itemize}
 \item{Listar todas as notícias onde a personalidade X se opõe à personalidade Y}
 \item{Listar os membros de um determinado partido que apoiaram alguma personalidade específica}
-\item{Lista de membros de um determinado partido apoiados/opostos por membros de um outro partido}
-\item{Lista de personalidades que estão ligadas através de uma relação familiar e de uma relação de oposição/apoio}
-\item{Lista de personalidades que fazem parte do mesmo Governo e que estão envolvidas numa relação de oposição/apoio}
+\item{Listar os membros de um determinado partido apoiados/opostos por membros de um outro partido}
+\item{Listar personalidades que estão ligadas através de uma relação familiar e de uma relação de oposição/apoio}
+\item{Listar personalidades que fazem parte do mesmo Governo e que estão envolvidas numa relação de oposição/apoio}
 \end{itemize}
 
 As principais contribuições deste trabalho são: 
 
 \begin{itemize}
 \item{um grafo semântico ligando personalidades políticas representadas na Wikidata através de uma relação de oposição ou apoio suportada por uma notícia}
-\item{um conjunto de dados anotados utilizado para treinar os classificadores de extracção das relações de títulos de notícias, e ligar as personalidades mencionadas à Wikidata}
+\item{um conjunto de dados anotados utilizado para treinar os classificadores de extracção de relações sentimento direccionado de títulos de notícias, e também para ligar as personalidades mencionadas à Wikidata}
 \item{um interface web que permite explorar o gráfico semântico}
 \end{itemize}
 
 Este artigo está organizado da seguinte forma: na Secção~\ref{sec_related_work} referimos trabalho relacionado, na Secção~\ref{sec_kb} descrevemos a base de conhecimento usada no suporte de ligação das personalidades políticas à Wikidata. A Secção~\ref{sec:data_sources} refere e descreve as fontes de notícias utilizadas. Na Secção~\ref{sec:rel_data_annot} detalhamos o conjunto de dados anotados e na Secção~\ref{sec:classifiers} os classificadores de aprendizagem supervisionada desenvolvidos. Na Secção~\ref{sec:pipeline} descrevemos o processo de extracção de triplos RDF e a construção do gráfico semântico. Finalmente, na Secção~\ref{sec:future_work} apresentamos ideias futuras para melhorar e continuar este trabalho.
 
-
 \section{Trabalho Relacionado}
 \label{sec_related_work}
 A análise de sentimento, no contexto de Processamento de Linguagem Natural, tem sido maioritariamente alvo de estudo em conteúdo gerado em redes sociais~\citep{10.1145/3185045} ou na avaliação de produtos ou serviços~\citep{pontiki-etal-2016-semeval}. Nestes domínios o autor do texto e o alvo da opinião são explícitos. No contexto de análise de notícias de política, onde existe com frequência um sentimento expresso entre actores políticos sob a forma de relações de apoio ou oposição~\citep{balahur2009opinion, balahur-etal-2010-sentiment}, as abordagens de análise de sentimento a produtos ou serviços não se aplicam, dado que a direcção da relação de sentimento tem que ser considerada.
 
-Nesta secção descrevemos: recursos semelhantes aos que produzimos neste trabalho e que tornamos públicos, e abordagens para a tarefa de extracção de sentimento direccionado em texto de notícias de política.
+Nesta secção descrevemos recursos semelhantes aos que produzimos neste trabalho, que tornamos públicos, e abordagens para a tarefa de extracção de sentimento direccionado em texto de notícias de política.
 
 \subsection{Recursos e dados anotados}
 
@@ -145,9 +144,9 @@ Nesta secção descrevemos: recursos semelhantes aos que produzimos neste trabal
 
 \cite{10.1145/1651461.1651468} propõem um método para a criação automática de um corpus para detecção de um sentimento positivo ou negativa para com uma personalidade política, e aplicam o método a comentários a notícias de jornais \textit{on-line}. Neste recurso a origem do sentimento, pressupõem-se, é do comentador.
 
-\cite{moreira2013tracking} disponibilizam uma ontologia descrevendo actores políticos, os seus cargos e partidos políticos afiliados usando fontes de informação oficiais e informação recolhida da \textit{web} para adicionar nomes alternativos às personalidades presentes na ontologia.
+\cite{moreira2013tracking} disponibilizam uma ontologia descrevendo actores políticos, os seus cargos e partidos políticos afiliados, usando fontes de informação oficiais e informação recolhida da \textit{web} para adicionar nomes alternativos às personalidades presentes na ontologia.
 
-\cite{de-arruda-etal-2015-annotated} criaram um corpus de notícias políticas em português do Brasil, anotando cada parágrafo com o sentimento segundo duas dimensões: o actor político referido pelo parágrafo, e o sentimento dessa referência: positivo, negativo ou neutro. Neste recurso fica em aberto qual é a origem do sentimento. \cite{BARANIAK20213627} disponibilizam corpora semelhante, anotando o sentimento para com uma personalidade política em manchetes de jornais \textit{on-line}, para o Inglês e Polaco.
+\cite{de-arruda-etal-2015-annotated} criaram um corpus de notícias políticas em português do Brasil, anotando cada parágrafo com o sentimento segundo duas dimensões: o actor político referido pelo parágrafo, e o sentimento dessa referência: positivo, negativo ou neutro. Neste recurso fica em aberto qual é a origem do sentimento. \cite{BARANIAK20213627} disponibilizam corpora semelhante, anotando o sentimento para com uma personalidade política em textos de jornais \textit{on-line}, para o Inglês e Polaco.
 
 \subsection{Extracção de sentimento direccionado em texto de notícias}
 
@@ -155,7 +154,7 @@ Vários autores exploraram métodos para extrair sentimento envolvendo actores p
 
 % 2013 - https://aclanthology.org/P13-1108.pdf Learning to Extract International Relations from Political Context
 % 2019 - https://aclanthology.org/N19-1167.pdf No Permanent Friends or Enemies: Tracking Relationships between Nations from News
-Alguns exploram estas relações num contexto de política internacional, i.e: os actores são nações em texto de notícias de política, sendo que algumas dessas relações implicitamente têm um sentimento positivo ou negativo. \cite{oconnor-etal-2013-learning} propõem um modelo não supervisionado baseado em \textit{topic models} e padrões linguísticos para identificar relações, de forma aberta, descrevendo conflitos entre nações referenciadas em artigos de notícias em Inglês. \cite{han-etal-2019-permanent} propõem também um modelo não supervisionado para gerar descritores de relações para pares de nações mencionadas em notícias em Inglês.
+Alguns exploram estas relações num contexto de política internacional, i.e.: os actores são nações referidas em texto de notícias de política, sendo que algumas dessas relações implicitamente têm um sentimento positivo ou negativo. \cite{oconnor-etal-2013-learning} propõem um modelo não supervisionado baseado em \textit{topic models} e padrões linguísticos para identificar relações, de forma aberta, descrevendo conflitos entre nações referenciadas em artigos de notícias em Inglês. \cite{han-etal-2019-permanent} propõem também um modelo não supervisionado para gerar descritores de relações para pares de nações mencionadas em notícias em Inglês.
 O modelo proposto estende o trabalho de \cite{iyyer-etal-2016-feuding} integrando informação linguística (i.e.: predicados verbais e substantivos comuns e próprios) por forma a identificar o contexto das relações.
 
 % 2019
@@ -166,9 +165,7 @@ O modelo proposto estende o trabalho de \cite{iyyer-etal-2016-feuding} integrand
 % 2021
 % Who Blames or Endorses Whom? Entity-to-Entity Directed Sentiment Extraction in News Text
 % https://aclanthology.org/2021.findings-acl.358/
-\cite{park-etal-2021-blames} propõe uma estrutura de relações para detectar o sentimento e a direcção: dada uma frase $s$ referindo duas entidades $p$ e $q$, detectar qual a relação de sentimento entre $p$ e $q$ de entre cinco possíveis: neutra, $p$ tem uma opinião positiva ou negativa em relação a $q$, ou $q$ tem uma opinião positiva ou negativa em relação a $p$. No seu trabalho os autores usam múltiplos modelos transformando a tarefa de extracção de sentimentos em sub-tarefas que respondem a perguntas de sim/não para cada um dos 5 sentimentos possíveis, combinando depois os vários resultados num resultado final. Esta abordagem é aplicada para Inglês num corpus criado pelos autores contendo frases de artigos de notícias contento pelo menos duas entidades, e anotado duas entidades e um dos 5 sentimentos possíveis entre as duas entidades. Os autores reportam uma macro-média de F\textsubscript{1} de 0,68.
-
-
+\cite{park-etal-2021-blames} propõe uma estrutura de relações para detectar o sentimento e a direcção: dada uma frase $s$ referindo duas entidades $p$ e $q$, detectar qual a relação de sentimento entre $p$ e $q$ de entre cinco possíveis: neutra, $p$ tem uma opinião positiva ou negativa em relação a $q$, ou $q$ tem uma opinião positiva ou negativa em relação a $p$. No seu trabalho os autores usam múltiplos modelos transformando a tarefa de extracção de sentimentos em sub-tarefas que respondem a perguntas de sim/não para cada um dos 5 sentimentos possíveis, combinando depois os vários resultados num resultado final. Esta abordagem é aplicada para Inglês num corpus criado pelos autores contendo frases de artigos de notícias contento pelo menos duas entidades, e anotado duas entidades. Os pares de entidades estão anotadas com um dos 5 sentimentos possíveis. Os autores reportam uma macro-média de F\textsubscript{1} de 0,68.
 
 \begin{table*}[!h]
   \centering
@@ -200,28 +197,28 @@ Dado que as personalidades envolvidas nas relações a extrair são personalidad
 \item pessoas que têm ou tiveram pelo menos um cargo de uma lista de cargos públicos portugueses previamente seleccionados (e.g.: \textit{ministro, líder do partido, embaixador}, etc.)
 \end{itemize}  
 
-Para além dos resultados destas interrogações, seleccionámos manualmente alguns identificadores de personalidades não abrangidas pelas interrogações SPARQL definidas acima, muitas delas de um contexto político internacional, mas que interagem com personalidades portuguesas. Acrescentamos também todos os identificadores de partidos políticos a que as personalidades possam estar afiliadas. Este processo resultou num total de 1 757 personalidades e de 37 partidos políticos. De notar que alguns dos partidos incluídos são partidos já extintos e/ou de um contexto internacional. Para cada um dos identificadores das personalidades e partidos descarregamos a página correspondente na Wikidata utilizando um outro \textit{endpoint}\footnote{\url{https://www.wikidata.org/wiki/Special:EntityData?}} público.
+Para além dos resultados destas interrogações, seleccionámos manualmente alguns identificadores de personalidades não abrangidas pelas interrogações SPARQL definidas acima, muitas delas de um contexto político internacional, mas que interagem com personalidades portuguesas. Acrescentámos também todos os identificadores de partidos políticos a que as personalidades recolhidas estão afiliadas. Este processo resultou num total de 1 757 personalidades e de 37 partidos políticos. De notar que alguns dos partidos incluídos são partidos já extintos e/ou de um contexto internacional. Para cada um dos identificadores das personalidades e partidos descarregamos a página correspondente na Wikidata utilizando um outro \textit{endpoint}\footnote{\url{https://www.wikidata.org/wiki/Special:EntityData?}} público.
 
 % SELECT (COUNT(DISTINCT ?person) as ?nr_persons) {?person wdt:P31 wd:Q5;}
 % SELECT (COUNT(DISTINCT ?person) as ?nr_parties) {?person wdt:P31 wd:Q7278;}
 
-Para cada personalidade política seleccionámos: o seu identificador na Wikidata, o seu nome mais comum e os nomes alternativos, e.g.: combinações de nomes próprios e apelidos. Com base nestes três campos, criámos um índice no ElasticSearch~\citep{10.5555/2904394} usando a sua configuração de omissão, não fazendo uso de qualquer funcionalidade extra tais como analisadores de $n$-gramas.
+Para cada personalidade política seleccionámos: o seu identificador na Wikidata, o seu nome mais comum e os nomes alternativos, i.e.: combinações de nomes próprios e apelidos. Com base nestes três campos, criámos um índice no ElasticSearch~\citep{10.5555/2904394} usando a sua configuração de omissão, não fazendo uso de qualquer funcionalidade extra tais como analisadores de $n$-gramas.
 
 \section{Fontes de dados}
 \label{sec:data_sources}
 
-A principal fonte de notícias foi o arquivo da web portuguesa~\citep{SearchPastPWA2013}. Usando a API pública de pesquisa recolhemos páginas arquivadas restringindo os resultados a ocorrências de nomes reunidos na Secção~\ref{sec_kb} e a 45 domínios \texttt{.pt} associados a diversas fontes de informação: jornais \textit{on-line}, \textit{websites} de estações de televisão e rádio, e portais agregadores de conteúdos. 
+A principal fonte de notícias foi o arquivo da \textit{web} portuguesa~\citep{SearchPastPWA2013}. Usando a API pública de pesquisa recolhemos páginas arquivadas restringindo os resultados a ocorrências de nomes reunidos na Secção~\ref{sec_kb} e a 45 domínios \texttt{.pt} associados a diversas fontes de informação: jornais \textit{on-line}, \textit{websites} de estações de televisão e rádio, e portais agregadores de conteúdos. 
 
-Uma segunda fonte de notícias foi a colecção CHAVE\footnote{\url{https://www.linguateca.pt/CHAVE/}}~\citep{DBLP:conf/clef/SantosR04, santos-rocha-2001-evaluating}, contendo os artigos do jornal PÚBLICO publicados entre 1994 e 1995. Finalmente, foram também acrescentados alguns artigos não arquivados pelo arquivo.pt, retirados directamente das secções {\it Mundo}, {\it Política} e {\it Sociedade} do site publico.pt. 
+Uma segunda fonte de notícias foi a colecção CHAVE\footnote{\url{https://www.linguateca.pt/CHAVE/}}\citep{DBLP:conf/clef/SantosR04, santos-rocha-2001-evaluating}, contendo os artigos do jornal PÚBLICO publicados entre 1994 e 1995. Finalmente, foram também adicionados alguns artigos não arquivados pelo arquivo.pt, retirados directamente das secções {\it Mundo}, {\it Política} e {\it Sociedade} do site publico.pt. 
 
-Deste processo resultou uma colecção de cerca de 13,7 milhões de títulos de artigos publicados entre 1994 e 2022. De seguida foi aplicado um pré-processamento de modo a remover notícias com: títulos duplicados, títulos com menos de 4 palavras, e títulos ou URLs contendo palavras que fazem partem de uma lista pré-definida (e.g.: desporto, celebridades, artes, cinema, etc.) que sugerem um o outro contexto que não política. Este pré-processamento resultou em 1,3 milhões de títulos distintos, cerca de 10\% dos dados inicialmente recolhidos.
+Deste processo resultou uma colecção de cerca de 13,7 milhões de títulos de artigos publicados entre 1994 e 2022. De seguida foi aplicado um pré-processamento de modo a remover notícias com: títulos duplicados, títulos com menos de 4 palavras, e títulos ou URLs contendo palavras que fazem partem de uma lista pré-definida (e.g.: \textit{desporto}, \textit{celebridades}, \textit{artes}, \textit{cinema}, etc.) que sugerem um o outro contexto que não política. Este pré-processamento resultou em 1,3 milhões de títulos distintos, cerca de 10\% dos dados inicialmente recolhidos.
 
 \section{Colecção de Relações Anotadas}
 \label{sec:rel_data_annot}
 
 De forma a poder treinar classificadores de aprendizagem supervisionada para identificar as relações presentes nos títulos das notícias, e fazer a ligação das personalidades com a Wikidata, anotámos manualmente títulos com: as menções a personalidades, os identificadores na Wikidata e a relação entre as personalidades mencionadas.
 
-Começamos por pré-processar todos os títulos recolhidos usando o pacote de software spaCy 3.0~\citep{spacy}, com o modelo~\texttt{pt\_core\_news\_lg-3.0.0} fizemos o reconhecimento de entidades mencionadas do tipo \texttt{PESSOA}. Para cada entidade reconhecida tentamos encontrar o seu identificador correspondente na Wikidata fazendo uma interrogação ao índice descrito na Secção~\ref{sec_kb} e assumindo que na lista de resultados o primeiro é o identificador correcto associado à entidade. Seleccionamos depois os títulos para anotação, incluindo apenas títulos referindo pelos menos duas personalidades.
+Começámos por pré-processar todos os títulos recolhidos usando o pacote de software spaCy 3.0~\citep{spacy}, com o modelo~\texttt{pt\_core\_news\_lg-3.0.0} fizemos o reconhecimento de entidades mencionadas do tipo \texttt{PESSOA}. Para cada entidade reconhecida tentamos encontrar o seu identificador correspondente na Wikidata fazendo uma interrogação ao índice descrito na Secção~\ref{sec_kb} e assumindo que na lista de resultados o primeiro é o identificador correcto associado à entidade. Seleccionamos depois os títulos para anotação, incluindo apenas títulos referindo pelos menos duas personalidades.
 
 No processo de anotação todos os títulos foram carregados para ferramenta de anotação Argilla\footnote{\url{https://github.com/argilla-io/argilla}}, e usando o interface gráfico fomos selecionando títulos para anotar. 
 
@@ -247,7 +244,7 @@ Este processo resultou num conjunto de dados contendo 3.324 títulos anotados. P
 	\end{center}
 \end{table}
 
-O ratio de relações de oposição para com relações de apoio é de 1,6 semelhante com os dados para Inglês disponibilizados por~\cite{park-etal-2021-blames}, onde esta mesma relação entre as duas classes é de 1,8.  A mesma propriedade entre os dois conjuntos de dados também se verifica na representatividade das classes, sendo a classe \textbf{outra} a mais presente em ambos os conjuntos de dados seguindo-se\textbf{oposição} e por último \textbf{apoio}.
+O rácio de relações de oposição para com relações de apoio é de 1,6, este valor é semelhante com os dados para Inglês disponibilizados por~\cite{park-etal-2021-blames}, onde esta mesma relação entre as duas classes é de 1,8.  A mesma propriedade entre os dois conjuntos de dados também se verifica na representatividade das classes, sendo a classe \textbf{outra} a mais presente em ambos os conjuntos de dados seguindo-se \textbf{oposição} e por último \textbf{apoio}.
 
 % fazer uma comparação com este dataset
 % Negative:  3,163 + 478 ->  3 641 -> 22%
@@ -277,27 +274,7 @@ Das 6.648 menções a nomes de personalidades políticas anotadas, 515 são dist
 
 Analisando a frequência de ocorrência de cada entidade observa-se que há pequeno número de entidades responsáveis por uma grande parte de todas as ocorrências de entidades nos dados anotados. Como mostra a Figura~\ref{fig:ent_power_law} existe um número pequeno de entidades frequentes, e uma longa lista de entidades pouco frequentes, em concreto, 96 personalidades distintas, i,.e.: 19\% das personalidades, são responsáveis por 80\% das menções a personalidades nos dados.
 
-Em termos de número de palavras contidas no título, excluindo palavras que fazem parte das entidades envolvidas numa relação, têm um mediana de 8 palavras com um máximo de 22 e um mínimo de 1.
-
-\begin{comment}
-A Tabela~\ref{tab:caracterization_rel_dataset} caracteriza os dados em termos de número de palavras contidas no título, excluindo todas as palavras que fazem parte das entidades mencionadas que estão envolvidas numa relação anotada.
-
-\begin{table}[]
-    \begin{center}
-    \begin{tabular}{l rrr}
-        {\bf Relação} & {\bf Mediana} & {\bf Máximo} & {\bf Minímo} \\
-        \hline
-        opõe-se       &    8 &  22   &  1   \\
-        apoia         &    7 &  17   &  1  \\
-        outra         &    8 &  18   &  1  \\
-    \end{tabular}
-	\caption{Caracterização dos títulos em número de palavras.}
-	\label{tab:caracterization_rel_dataset}
-	\end{center}
-\end{table}
-\end{comment}
-
-Este conjunto de dados anotados encontram-se online\footnote{\url{https://github.com/politiquices/data-releases}} sob o formato JSON como ilustrado na Figura~\ref{fig:json_sample}.
+Em termos de número de palavras contidas no título, excluindo palavras que fazem parte das entidades envolvidas numa relação, têm um mediana de 8 palavras com um máximo de 22 e um mínimo de 1. Este conjunto de dados anotados encontram-se online\footnote{\url{https://github.com/politiquices/data-releases}} sob o formato JSON como ilustrado na Figura~\ref{fig:json_sample}.
 
 \begin{figure}[!h]
 \begin{Verbatim}[fontsize=\small]
@@ -333,7 +310,7 @@ O processo de extração de triplos RDF a partir dos títulos das notícias envo
 
 O reconhecimento de entidades mencionadas é baseado num método híbrido, combinando regras com um modelo supervisionado.
 
-Usando a componente \texttt{EntityRuler}\footnote{\url{https://spacy.io/usage/rule-based-matching}} do spaCy 3.0, definimos uma série de regras combinando padrões baseados nos nomes de todas as personalidades da base de conhecimento descrita na Secção~\ref{sec_kb}. Para detectar as entidades do tipo pessoa este classificador aplica primeiro as regras e de seguida o modelo supervisionado para Português do spaCy. Em situações de desacordo entre as duas abordagens as entidades marcadas com regras têm prioridade.
+Usando a componente \texttt{EntityRuler}\footnote{\url{https://spacy.io/usage/rule-based-matching}} do spaCy 3.0, definimos uma série de regras combinando padrões baseados nos nomes de todas as personalidades da base de conhecimento descrita na Secção~\ref{sec_kb}. Para detectar as entidades do tipo \texttt{PESSOA} este classificador aplica primeiro as regras e de seguida o modelo supervisionado para Português do spaCy. Em situações de desacordo entre as duas abordagens as entidades marcadas com regras têm prioridade.
 
 A Tabela~\ref{tab:results_ner} mostra a performance para as 3 abordagens sob o conjunto de dados anotado.
 
@@ -356,9 +333,9 @@ A Tabela~\ref{tab:results_ner} mostra a performance para as 3 abordagens sob o c
 \subsection{Ligação com a Wikidata}
 \label{subsec:ent_linking}
 
-O algoritmo para associar personalidades com identificadores na Wikidata tem duas fases. Numa primeira fase tenta usar apenas o título da notícia, se este processo falhar, tenta então usar possíveis referências às personalidades no texto da notícia.
+O algoritmo para associar personalidades com identificadores na Wikidata tem duas fases. Numa primeira fase o algoritmo tenta apenas usar o título da notícia, se este processo falhar, tenta então usar possíveis referências às personalidades no texto da notícia.
 
-O algoritmo começar por fazer uma interrogação à base de conhecimento (BC), usando a referência à personalidade presente no título, gerando assim uma lista de candidatos para uma determinada personalidade. Se a lista contém apenas um candidato e a similaridade~\citep{jaro1989} para com a personalidade referida no título é de pelo menos 0,8 esse candidato é seleccionado. Se houver mais do que um candidato, o algoritmo filtra apenas aqueles com uma similaridade de 1,0 e se houver apenas um esse é o candidato seleccionado. Em qualquer outro caso nenhum candidato é retornado. 
+O algoritmo começar primeiro por fazer uma interrogação à base de conhecimento (BC), usando a referência à personalidade presente no título, gerando assim uma lista de candidatos para uma determinada personalidade. Se a lista contém apenas um candidato e a similaridade~\citep{jaro1989} para com a personalidade referida no título é de pelo menos 0,8 esse candidato é seleccionado. Se houver mais do que um candidato, o algoritmo filtra apenas aqueles com uma similaridade de 1,0 e se houver apenas um esse é o candidato seleccionado. Em qualquer outro caso nenhum candidato é retornado. 
 
 O Algoritmo 1 descreve o procedimento que usa apenas o título da notícia.
 
@@ -376,9 +353,9 @@ def title_only(ent, candidates):
 
 Se nenhum candidato for gerado na primeira fase ou nenhum for seleccionado da lista de candidatos o algoritmo tenta expandir as entidades mencionadas no título com base no texto da notícia, explorando um padrão: uma personalidade mencionada no título por uma versão curta do seu nome, e.g.: apenas o apelido, é normalmente referida no texto da notícia por um nome mais completo.
 
-O algoritmo identifica todas as pessoas mencionadas no texto da notícia, usando a componente descrita na Secção~\ref{subsec:ner}, e seleciona apenas as que têm pelo menos um nome em comum com o nome da personalidade referida no título, gerando assim uma entidade expandida, assumindo que corresponde à mesma pessoa do título.
+O algoritmo identifica todas as pessoas mencionadas no texto da notícia, usando a componente descrita na Secção~\ref{subsec:ner}, e seleciona apenas as que têm pelo menos um nome em comum com o nome da personalidade referida no título, gerando assim uma entidade expandida, e assumindo que corresponde à mesma entidade referida no título.
 
-Se do processo resulta apenas uma entidade expandida e se há uma similaridade de 1.0 com um dos candidatos anteriormente seleccionados da BC, esse candidato é escolhido. Caso contrário a entidade expandida é usada para fazer uma interrogação à BC e recolher uma nova lista de candidatos. Se nessa lista apenas há um candidato e a sua similaridade é de pelo menos 0.8 para com a entidade expandida, esse candidato é escolhido. Se há mais do que um candidatos e apenas um tem uma similaridade 1.0 com a entidade expandida esse é escolhido. 
+Se do processo resulta apenas uma entidade expandida e se há uma similaridade de 1.0 com um dos candidatos anteriormente seleccionados da BC, esse candidato é escolhido. Caso contrário a entidade expandida é usada para fazer uma interrogação à BC e recolher uma nova lista de candidatos. Se nessa lista apenas há um candidato e a sua similaridade é de pelo menos 0.8 para com a entidade expandida, esse candidato é escolhido. Se há mais do que um candidato e apenas um tem uma similaridade 1.0 com a entidade expandida, esse é escolhido. 
 
 Se do processo de expansão resultam várias entidades expandidas, filtramos candidatos da BC com similaridade 1.0 para com a entidade expandida, se existir apenas um, esse candidato é o escolhido. 
 
@@ -414,23 +391,7 @@ def article_text(expanded, candidates):
   return None
 \end{lstlisting}
 
-
-\begin{comment}
-
-\begin{lstlisting}[language=python,columns=fullflexible,label={lst:alg3},caption=News text approach.]]
-
-def entity_linking(per):
-    candidates = get_candidates(ent)
-    wiki_id = title_only(per, candidates)
-    if not wiki_id:
-        expanded = expand(per, news_text)
-        wiki_id = article_text(candidates, expanded)
-    return wiki_id
-\end{lstlisting}
-
-\end{comment}
-
-Os resultados desta abordagem sobre o conjunto de dados anotados e descritos são descritos na Tabela~\ref{tab:ent_linking_results}. A classificação \textit{incorrecta} corresponde a personalidades que não foram associadas ao identificador correcto na Wikidata, \textit{não desambiguada} para as que o algoritmo não conseguiu seleccionar um identificador único de entre todos os candidatos ou a BC não retornou nenhum resultado.
+Os resultados desta abordagem sobre o conjunto de dados anotados são descritos na Tabela~\ref{tab:ent_linking_results}. A classificação \textit{incorrecta} corresponde a personalidades que não foram associadas ao identificador correcto na Wikidata, \textit{não desambiguada} para as que o algoritmo não conseguiu seleccionar um identificador único de entre todos os candidatos ou a BC não retornou nenhum resultado.
 
 Na Tabela~\ref{tab:ent_linking_results} são reportadas duas avaliações, a primeira coluna descreve os resultados para o algoritmo base, sem mapeamentos. A segunda coluna considera a ambiguidade que uma referência pode ter em termos de personalidades que representa. Por exemplo, nos dados anotados, todas as menções a \textit{Cavaco} correspondem à personalidade \textit{Cavaco Silva}, com base nisto o algoritmo mapeia todas as referências a \textit{Cavaco} para \textit{Cavaco Silva}. Da mesma forma, todas as menções a \textit{Marques Mendes} correspondem à personalidade \textit{Luís Marques Mendes}. Fazendo uso destes mapeamentos reduzimos o número de entidades para as quais o algoritmo não consegue encontrar um identificador.
 
@@ -453,7 +414,7 @@ Na Tabela~\ref{tab:ent_linking_results} são reportadas duas avaliações, a pri
 \subsection{Classificador de Tipo de Relação}
 \label{subsec:rel_classifier}
 
-Optamos por decompor a tarefa de classificação da relação em duas tarefas: classificação do tipo de relação e direcção da relação, por oposição a desenvolver um único classificador que teria que distinguir de entre 5 classes possíveis. Esta secção descreve o classificador desenvolvido para detectar o tipo de relação presente num título, tendo 3 classes possíveis: \textbf{opõe-se}, \textbf{apoia} e \textbf{outra}. Todas as experiências descritas foram feitas com uma avaliação cruzada de 4 partições.
+Optamos por decompor a tarefa de classificação da relação em duas tarefas: classificação do tipo de relação e direcção da relação, por oposição a desenvolver um único classificador que teria que distinguir de entre 5 classes possíveis, e com classes muito desequilibradas em termos de representatividade. Esta secção descreve o classificador desenvolvido para detectar o tipo de relação presente num título, tendo 3 classes possíveis: \textbf{opõe-se}, \textbf{apoia} e \textbf{outra}. Todas as experiências descritas foram feitas com uma avaliação cruzada de 4 partições\footnote{\url{https://github.com/politiquices/data-releases}}.
 
 Avaliámos diferentes abordagens para a classificação supervisionada das relações presentes nos títulos, nomeadamente: um classificador SVM~\citep{cortes1995support} com um \textit{kernel} linear, uma rede neuronal recorrente do tipo LSTM~\citep{10.1162/neco.1997.9.8.1735}, e uma rede neuronal do tipo \textit{transformer}, o DistilBERT~\citep{9463516}.
 
@@ -463,7 +424,7 @@ A rede neuronal recorrente LSTM foi usada numa arquitectura bidireccional, ou se
 %optimizer = optim.Adam(model.parameters())
 %criterion = nn.BCELoss()
 
-O modelo DistilBERT foi treinado tendo como base um modelo pré-treinado para português~\citep{abdaoui-etal-2020-load}, sendo depois afinado no conjunto de dados anotado, i.e.: os pesos de todos os \textit{layers} pré-treinados foram actualizados tendo em conta a tarefa de classificação da relação. A rede foi treinada durante 5 \textit{epochs} com um \textit{batch size} de 8.
+O modelo DistilBERT foi treinado tendo como base um modelo pré-treinado para o Português~\citep{abdaoui-etal-2020-load}, sendo depois afinado no conjunto de dados anotado, i.e.: os pesos de todos os \textit{layers} pré-treinados foram actualizados tendo em conta a tarefa de classificação da relação. A rede foi treinada durante 5 \textit{epochs} com um \textit{batch size} de 8.
 %optimizer = optim.Adam(model.parameters())
 %tipo de loss function? nn.BCEWithLogitsLoss(pos_weight=self._class_weights)
 
@@ -524,7 +485,10 @@ A Tabela~\ref{tab:results_relacao} descreve os resultados para os vários classi
 %\item{\textit{Louçã acusa Passos de ser o “cangalheiro da melhor maternidade” do país}}
 \end{itemize}
 
-Outras relações são ambíguas e difíceis de classificar sem mais contexto do que aquele presente no título. No conjunto de dados que tornamos público, todos os títulos contêm um URL para o texto da notícia.
+Outras relações são ambíguas e difíceis de classificar sem mais contexto do que aquele presente no título. No conjunto de dados que tornamos público, todos os títulos contêm um URL para o texto da notícia. 
+
+Os resultados obtidos com as abordagens descritas, para os dados em Português, estão em linha com os resultados reportados anteriormente em dados em Inglês~\citep{liang2019blames, park-etal-2021-blames}.
+
 
 \begin{table*}
   \centering
@@ -549,7 +513,7 @@ Outras relações são ambíguas e difíceis de classificar sem mais contexto do
 
 O classificador da direcção tem 2 classes possíveis. Como mostra a Tabela~\ref{tab:rel_dataset}, o conjunto de dados tem um viés para com a classe Ent\textsubscript{1}$\rightarrow$Ent\textsubscript{2} representando 91,5\% dos dados. Assim, optamos por desenvolver uma abordagem baseada em regras para detectar apenas a classe Ent\textsubscript{1}$\leftarrow$Ent\textsubscript{2}, e sempre que nenhuma das regras se verifica o classificador atribui a classe Ent\textsubscript{1}$\rightarrow$Ent\textsubscript{2}.
 
-Definimos regras baseadas em padrões construídos com informação morfológica e sintáctica~\citep{nivre-etal-2020-universal} extraída do título com o spaCy, usando o mesmo modelo descrito na Secção~\ref{sec:rel_data_annot}. Extraímos a informação morfo-sintáctica de todas as palavras, incluindo para os verbos informação sobre a conjugação: a pessoa e o número;
+Definimos regras baseadas em padrões construídos com informação morfológica e sintáctica~\citep{nivre-etal-2020-universal} extraída do título com o spaCy, usando o mesmo modelo descrito na Secção~\ref{sec:rel_data_annot}. Extraímos a informação morfo-sintáctica de todas as palavras, incluindo para os verbos informação sobre a conjugação: a pessoa e o número. Os padrões definidos foram os seguintes:
 
 \begin{itemize}
 
@@ -579,18 +543,18 @@ A Tabela~\ref{tab:direction_clf_results} contém os resultados deste classificad
 	\end{center}
 \end{table}
 
-Os resultados mostram que o método proposto classifica correctamente grande parte da direcção das relações Ent\textsubscript{1}$\leftarrow$Ent\textsubscript{2}, a única classe para as quais foram desenvolvidas regras.
+Os resultados mostram que o método proposto classifica correctamente grande parte da direcção das relações Ent\textsubscript{1}$\leftarrow$Ent\textsubscript{2}, a única classe para as quais foram desenvolvidas regras, sem prejuízo para com a classe Ent\textsubscript{1}$\rightarrow$Ent\textsubscript{2}.
 
 \section{Grafo Semântico}
 \label{sec:pipeline}
 
-Os componentes descritos na secção anterior formam o processo de extracção de triplos RDF a partir dos títulos de notícias recolhidos. Os triplos gerados são depois indexados numa base de dados de formando um grafo semântico que pode ser interrogado recorrendo à linguagem SPARQL.
+Os componentes descritos na secção anterior formam o processo de extracção de triplos RDF a partir dos títulos de notícias recolhidos. Os triplos gerados são indexados numa base de dados de forma a gerar um grafo semântico que pode ser interrogado recorrendo à linguagem SPARQL.
 
-O processo de extracção começa por fazer o reconhecimento de personalidades no título na notícia e a sua ligação com o identificador de cada personalidade na Wikidata. O processo de extracção continua se ambas as personalidades reconhecidas foram ligadas com um identificador na Wikidata, caso contrário o título é descartado. Se ambas as personalidades são ligadas com a Wikidata é detectado o tipo de relação presente no título, usando o modelo com base no DistilBERT. Se a relação entre as personalidades no título da notícia não for classificada como \textbf{outra} o classificador da direcção da relação é também aplicado ao título. 
+O processo de extracção começa por fazer o reconhecimento de personalidades no título da notícia e a sua ligação com o identificador de cada personalidade na Wikidata. O processo de extracção continua se ambas as personalidades reconhecidas foram ligadas com um identificador na Wikidata, caso contrário o título é descartado. O tipo de relação presente no título é detectado com o modelo DistilBERT. Se a relação entre as personalidades no título da notícia não for classificada como \textbf{outra} o classificador da direcção da relação é também aplicado ao título, caso contrário o título é descartado.
 
 Para todos os títulos considerados o resultado final é um triplo RDF, ligando personalidades representadas na Wikidata através de uma relação de oposição ou apoio suportada por uma notícia. Os triplos RDF gerados são indexados num motor SPARQL~\citep{jena2015free} juntamente com um sub-grafo da Wikidata descrito na Secção~\ref{sec_kb}.
 
-O grafo gerado tem um total de 680 personalidades políticas, 107 partidos políticos 10 361 notícias. Está disponível online no formato \textit{Terse RDF Triple Language}\footnote{\url{https://github.com/politiquices/data-releases}} e poder ser também explorado através de um interface web\footnote{\url{https://www.politiquices.pt}}.
+O grafo gerado tem um total de 680 personalidades políticas, 107 partidos políticos e 10.361 notícias. Está disponível \textit{on-line} no formato \textit{Terse RDF Triple Language}\footnote{\url{https://github.com/politiquices/data-releases}} e poder ser também explorado através de um interface textit{web}\footnote{\url{https://www.politiquices.pt}}.
 
 \section{Trabalho Futuro}
 \label{sec:future_work}
@@ -599,7 +563,7 @@ Como trabalho futuro gostaríamos de explorar o texto da notícia de forma a com
 
 Alguns títulos contêm uma relação mútua: \textit{``Sócrates e Alegre trocam acusações sobre co-incineração"} ou \textit{``Pinto da Costa rebate críticas de Pacheco Pereira"}, poderiam ser classificados com a direcção Ent\textsubscript{2}$\leftrightarrow$Ent\textsubscript{1}, indicando neste caso que ambas as personalidades se acusam.
 
-Este trabalho também deixa em aberto oportunidades de realizar diversos estudos com base na estrutura do grafo, por exemplo: encontrar comunidades de apoio e oposição em função do tempo e verificar quais mudanças entre dentro dessas comunidades ou por estudar triângulos políticos: se duas personalidades políticas, X e Y, sempre acusam ou defendem uma terceira personalidade Z, qual será a relação típica expectável entre X e Y?
+Este trabalho também deixa em aberto oportunidades de realizar diversos estudos com base na estrutura do grafo, por exemplo: encontrar comunidades de apoio e oposição em função do tempo e verificar quais as mudanças dentro dessas comunidades. Pode-se também estudar triângulos políticos: se duas personalidades políticas, X e Y, sempre acusam ou defendem uma terceira personalidade Z, qual será a relação típica expectável entre X e Y?
 
 \section*{Agradecimentos}
 
